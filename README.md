@@ -105,23 +105,6 @@ Open `frontend/index.html` in your browser or use **VS Code Live Server**.
 
 ---
 
-## 🌿 Git Workflow
-
-We use a feature-branch workflow to keep development organized.
-
-```text
-main
- └── dev
-      ├── feature/auth
-      ├── feature/dashboard
-      ├── feature/expense-modal
-      ├── feature/wallet-management
-      ├── feature/analytics
-      ├── feature/budgets
-      ├── feature/savings
-      └── feature/sadaqa
-```
-
 ### Basic Workflow
 
 ```bash
@@ -158,7 +141,7 @@ Create a Pull Request to `dev` after completing the feature.
 | Name | Role | GitHub |
 |---|---|---|
 | **S M Hasibur Rahman** | Frontend Leader | [@smhasiburrahman](https://github.com/smhasiburrahman) |
-| **Fardin Mustafi** | Frontend | [@fardinmustafi](https://github.com/fardinmustafi) |
+| **Fardin Mustafi** | Frontend | [@fardinmustafi](https://github.com/fardin-mustafi) |
 | **Md. Sami Chowdhury** | Backend Leader | [@RotenZen](https://github.com/RotenZen) |
 | **Md. Mahamud Hasan** | Backend | [@Mahamud-Hasan123](https://github.com/Mahamud-Hasan123) |
 

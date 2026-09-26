@@ -1,0 +1,255 @@
+/* --------- Global Reset & Variables ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+:root {
+  --teal-primary: #19957d;
+  --teal-dark: #12725f;
+  --teal-accent: #2dd4bf;
+  --bg-dark: #071e22;
+  --text-dark: #0f172a;
+  --text-gray: #64748b;
+  --border-color: #e2e8f0;
+}
+
+body {
+  background-color: #ffffff;
+  color: var(--text-dark);
+  min-height: 100vh;
+}
+
+/* Auth Container */
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --------- Left Side (Brand Hero) ---------- */
+.auth-left {
+  flex: 1.1;
+  background: radial-gradient(circle at 20% 30%, #0d383b 0%, var(--bg-dark) 100%);
+  color: #ffffff;
+  padding: 3rem 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background-color: var(--teal-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+}
+
+.hero-content .highlight {
+  color: var(--teal-accent);
+}
+
+.hero-content p {
+  color: #94a3b8;
+  max-width: 420px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.stats-row {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.stat-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  padding: 1.2rem;
+  border-radius: 12px;
+}
+
+.stat-card h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-card p {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* --------- Right Side (Form Area) ---------- */
+.auth-right {
+  flex: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  position: relative;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.form-header {
+  margin-bottom: 1.8rem;
+}
+
+.form-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.form-header p {
+  color: var(--text-gray);
+  margin-top: 6px;
+  font-size: 0.95rem;
+}
+
+.form-group {
+  margin-bottom: 1.1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 0.4rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+  border-color: var(--teal-primary);
+  box-shadow: 0 0 0 3px rgba(25, 149, 125, 0.15);
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.form-extra {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.2rem;
+}
+
+.link-small {
+  color: #64748b;
+  font-size: 0.82rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-small:hover {
+  text-decoration: underline;
+}
+
+/* --------- Sign In / Register Button ---------- */
+.btn-primary {
+  width: 100%;
+  background-color: var(--teal-primary);
+  color: #ffffff;
+  border: none;
+  padding: 13px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--teal-dark);
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.form-footer p {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.form-footer a {
+  color: var(--teal-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.demo-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 8px;
+}
+
+.help-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .auth-container { flex-direction: column; }
+  .auth-left { padding: 2rem; }
+  .stats-row { display: none; }
+}

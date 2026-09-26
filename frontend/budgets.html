@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budgets & Categories - Financial Bestie</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/budgets.css" />
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-wallet"></i></div>
+        <div class="brand-text">
+          <span class="title">Financial</span>
+          <span class="subtitle">Bestie</span>
+        </div>
+      </div>
+
+      <button class="btn-add-expense" id="addExpenseBtn">
+        <i class="fa-solid fa-plus"></i> Add Expense
+      </button>
+
+      <!-- Sidebar Navigation Menu -->
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="dashboard.html"><i class="fa-solid fa-table-columns"></i> <span>Dashboard</span></a></li>
+          <li><a href="analytics.html"><i class="fa-solid fa-chart-pie"></i> <span>Analytics</span></a></li>
+          <li><a href="wallets.html"><i class="fa-regular fa-credit-card"></i> <span>Wallets</span></a></li>
+          <li class="active"><a href="budgets.html"><i class="fa-solid fa-layer-group"></i> <span>Budgets & Categories</span></a><span class="active-dot"></span></li>
+          <li><a href="savings.html"><i class="fa-solid fa-piggy-bank"></i> <span>Savings Vaults</span></a></li>
+          <li><a href="sadaqa.html"><i class="fa-regular fa-heart"></i> <span>Charity  Tracker</span></a></li>
+          <li><a href="search.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></a></li>
+          <li><a href="ai-bestie.html"><i class="fa-regular fa-message"></i> <span>AI Bestie</span></a></li>
+          <li><a href="settings.html"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
+        </ul>
+      </nav>
+
+      <!-- User Profile Footer -->
+      <div class="sidebar-footer">
+        <div class="collapse-btn" id="logoutBtn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
+        </div>
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">R</div>
+          <div class="user-info">
+            <h4 id="userName">Rahim Uddin</h4>
+            <p id="userEmail">rahim@example.com</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="top-header">
+        <h2>Budgets & Categories</h2>
+        <div class="header-actions">
+          <div class="date-selector">
+            <i class="fa-regular fa-calendar"></i>
+            <span id="dateRangeText">Jul 1 — Jul 25, 2025</span>
+            <i class="fa-solid fa-chevron-down arrow-down"></i>
+          </div>
+          <button class="btn-export"><i class="fa-solid fa-arrow-down"></i> Export</button>
+          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
+        </div>
+      </header>
+
+      <div class="dashboard-body">
+        <!-- 1. Budget Categories Table Section -->
+        <div class="section-container card-table-wrapper">
+          <div class="section-header">
+            <h3>Budget Categories</h3>
+            <button class="btn-primary-small" id="openAddCategoryModal">
+              <i class="fa-solid fa-plus"></i> Add Category
+            </button>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>CATEGORY</th>
+                <th>SPENT</th>
+                <th>BUDGET CAP</th>
+                <th>PROGRESS</th>
+                <th>STATUS</th>
+                <th>LIMIT TYPE</th>
+                <th></th>
+              </tr>
+            </thead>
+            <!-- Dynamic Rows -->
+            <tbody id="budgetsTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- 2. Recurring Transactions Table Section -->
+        <div class="section-container card-table-wrapper" style="margin-top: 1.8rem;">
+          <div class="section-header">
+            <h3>Recurring Transactions</h3>
+            <a href="#" class="header-link" id="openAddRecurringModal">
+              <i class="fa-solid fa-plus"></i> Add Recurring
+            </a>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>NAME</th>
+                <th>AMOUNT</th>
+                <th>FREQUENCY</th>
+                <th>NEXT CHARGE</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <!-- Dynamic Rows -->
+            <tbody id="recurringTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <a href="#" class="help-btn" title="Need help?"><i class="fa-solid fa-question"></i></a>
+    </main>
+  </div>
+
+  <!-- Modal 1: Add Budget Category -->
+  <div class="modal-backdrop" id="addCategoryModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add Budget Category</h3>
+        <button type="button" class="btn-close-modal" id="closeCatModalBtn">&times;</button>
+      </div>
+
+      <form id="addCategoryForm">
+        <div class="form-group">
+          <label>CATEGORY NAME</label>
+          <input type="text" class="text-input" id="catNameInput" placeholder="e.g. Healthcare, Education" required />
+        </div>
+
+        <div class="form-group">
+          <label>MONTHLY BUDGET CAP</label>
+          <div class="balance-input-box">
+            <span class="currency-symbol">৳</span>
+            <input type="number" id="catCapInput" placeholder="0" required min="100" />
+          </div>
+        </div>
+
+        <!-- Icon Picker Grid -->
+        <div class="form-group">
+          <label>ICON</label>
+          <div class="icon-selector-grid-cat">
+            <button type="button" class="icon-pill-btn active" data-icon="fa-utensils" data-name="Food">
+              <i class="fa-solid fa-utensils"></i><span>Food</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-car" data-name="Transport">
+              <i class="fa-solid fa-car"></i><span>Transport</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-bag-shopping" data-name="Shopping">
+              <i class="fa-solid fa-bag-shopping"></i><span>Shopping</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-film" data-name="Movies">
+              <i class="fa-solid fa-film"></i><span>Movies</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-bolt" data-name="Utilities">
+              <i class="fa-solid fa-bolt"></i><span>Utilities</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-mug-hot" data-name="Coffee">
+              <i class="fa-solid fa-mug-hot"></i><span>Coffee</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-heart" data-name="Health">
+              <i class="fa-solid fa-heart"></i><span>Health</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-house" data-name="Home">
+              <i class="fa-solid fa-house"></i><span>Home</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Color Palette -->
+        <div class="form-group">
+          <label>COLOR</label>
+          <div class="color-palette">
+            <button type="button" class="color-swatch active" data-color="#f59e0b" style="background-color: #f59e0b;"></button>
+            <button type="button" class="color-swatch" data-color="#6366f1" style="background-color: #6366f1;"></button>
+            <button type="button" class="color-swatch" data-color="#10b981" style="background-color: #10b981;"></button>
+            <button type="button" class="color-swatch" data-color="#ec4899" style="background-color: #ec4899;"></button>
+            <button type="button" class="color-swatch" data-color="#8b5cf6" style="background-color: #8b5cf6;"></button>
+            <button type="button" class="color-swatch" data-color="#ef4444" style="background-color: #ef4444;"></button>
+            <button type="button" class="color-swatch" data-color="#14806c" style="background-color: #14806c;"></button>
+            <button type="button" class="color-swatch" data-color="#3b82f6" style="background-color: #3b82f6;"></button>
+          </div>
+        </div>
+
+        <!-- Real-time Preview Box -->
+        <div class="category-preview-card">
+          <div class="preview-left">
+            <div class="preview-icon-wrap" id="catPreviewIconWrap" style="background-color: #fef3c7; color: #f59e0b;">
+              <i class="fa-solid fa-utensils" id="catPreviewIcon"></i>
+            </div>
+            <div>
+              <h4 id="catPreviewName">Category Name</h4>
+              <p id="catPreviewCap">Budget cap: ৳0</p>
+            </div>
+          </div>
+          <span class="preview-badge">On Track</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="cancelCatModalBtn">Cancel</button>
+          <button type="submit" class="btn-submit-green">Add Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add Recurring Transaction -->
+  <div class="modal-backdrop" id="addRecurringModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add Recurring Transaction</h3>
+        <button type="button" class="btn-close-modal" id="closeRecurModalBtn">&times;</button>
+      </div>
+
+      <form id="addRecurringForm">
+        <div class="form-group">
+          <label>NAME</label>
+          <input type="text" class="text-input" id="recurNameInput" placeholder="e.g. Gym Membership, Spotify" required />
+        </div>
+
+        <div class="form-row-two">
+          <div class="form-group">
+            <label>AMOUNT</label>
+            <div class="balance-input-box">
+              <span class="currency-symbol">৳</span>
+              <input type="number" id="recurAmountInput" placeholder="0" required min="1" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>FREQUENCY</label>
+            <div class="select-box-styled">
+              <select id="recurFreqSelect">
+                <option value="Monthly">Monthly</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Yearly">Yearly</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row-two">
+          <div class="form-group">
+            <label>NEXT CHARGE DATE</label>
+            <input type="date" class="text-input" id="recurDateInput" required />
+          </div>
+          <div class="form-group">
+            <label>WALLET</label>
+            <div class="select-box-styled wallet-select-wrap">
+              <i class="fa-solid fa-money-bill-1" style="color: #10b981; margin-right: 6px;"></i>
+              <select id="recurWalletSelect">
+                <option value="Cash">Cash</option>
+                <option value="bKash">bKash</option>
+                <option value="Rocket">Rocket</option>
+                <option value="BRAC Bank">BRAC Bank</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Icon Picker Row -->
+        <div class="form-group">
+          <label>ICON</label>
+          <div class="icon-selector-grid-recur">
+            <button type="button" class="icon-pill-btn active" data-icon="fa-house" data-name="Home">
+              <i class="fa-solid fa-house"></i><span>Home</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-wifi" data-name="Internet">
+              <i class="fa-solid fa-wifi"></i><span>Internet</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-film" data-name="Movies">
+              <i class="fa-solid fa-film"></i><span>Movies</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-phone" data-name="Phone">
+              <i class="fa-solid fa-phone"></i><span>Phone</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-bolt" data-name="Utilities">
+              <i class="fa-solid fa-bolt"></i><span>Utilities</span>
+            </button>
+            <button type="button" class="icon-pill-btn" data-icon="fa-credit-card" data-name="Card">
+              <i class="fa-solid fa-credit-card"></i><span>Card</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="cancelRecurModalBtn">Cancel</button>
+          <button type="submit" class="btn-submit-green">Add Recurring</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/budgets.js"></script>
+  <script src="js/expense-modal.js"></script>
+
+</body>
+</html>

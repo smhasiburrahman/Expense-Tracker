@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Financial Bestie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Link to CSS -->
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+  <div class="auth-container">
+    
+    <!-- --------- Left Hero Section ---------- -->
+    <div class="auth-left">
+      <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-wallet"></i></div>
+        <span>Financial Bestie</span>
+      </div>
+
+      <div class="hero-content">
+        <h1>Your money,<br>finally<br><span class="highlight">making sense.</span></h1>
+        <p>Track expenses in BDT, manage budgets, grow savings, and get AI-powered insights — built for Bangladesh.</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <h3>12,400+</h3>
+          <p>Active Users</p>
+        </div>
+        <div class="stat-card">
+          <h3>৳4.2 Cr</h3>
+          <p>Saved Together</p>
+        </div>
+        <div class="stat-card">
+          <h3>98,000+</h3>
+          <p>Budgets Tracked</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- --------- Right Form Section (Login) ---------- -->
+    <div class="auth-right">
+      <div class="form-wrapper">
+        <div class="form-header">
+          <h2>Welcome back</h2>
+          <p>Sign in to manage your finances</p>
+        </div>
+
+        <form id="loginForm">
+          <!-- Email Input -->
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" id="email" placeholder="hasiburrahman@gmail.com" required />
+          </div>
+
+          <!-- Password Input -->
+          <div class="form-group password-group">
+            <label for="password">Password</label>
+            <div class="input-with-icon">
+              <input type="password" id="password" placeholder="••••••••" required />
+ <!-- Toggle Password Button -->
+              <button type="button" class="eye-btn" id="toggleRegPassword">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-extra">
+            <a href="#" class="link-small">Forgot password?</a>
+          </div>
+
+          <!-- --------- Sign In Button ---------- -->
+          <button type="submit" class="btn-primary" id="signInBtn">Sign in</button>
+        </form>
+
+        <div class="form-footer">
+          <!-- Direct Link to Register Page -->
+          <p>Don't have an account? <a href="register.html">Sign up free</a></p>
+        </div>
+      </div>
+
+      <a href="#" class="help-btn" title="Need help?"><i class="fa-solid fa-question"></i></a>
+    </div>
+
+  </div>
+
+  <!-- Link to JS -->
+  <script src="js/auth.js"></script>
+</body>
+</html>

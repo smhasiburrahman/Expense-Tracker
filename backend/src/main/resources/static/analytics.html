@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics - Financial Bestie</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="css/analytics.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-wallet"></i></div>
+        <div class="brand-text">
+          <span class="title">Financial</span>
+          <span class="subtitle">Bestie</span>
+        </div>
+      </div>
+
+      <!-- Add Expense Button -->
+      <button class="btn-add-expense" id="addExpenseBtn">
+        <i class="fa-solid fa-plus"></i> Add Expense
+      </button>
+
+      <!-- Sidebar Navigation Links -->
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="dashboard.html"><i class="fa-solid fa-table-columns"></i> <span>Dashboard</span></a>
+          </li>
+          <li class="active">
+            <a href="analytics.html"><i class="fa-solid fa-chart-pie"></i> <span>Analytics</span></a>
+            <span class="active-dot"></span>
+          </li>
+          <li>
+            <a href="wallets.html"><i class="fa-regular fa-credit-card"></i> <span>Wallets</span></a>
+          </li>
+          <li>
+            <a href="budgets.html"><i class="fa-solid fa-layer-group"></i> <span>Budgets & Categories</span></a>
+          </li>
+          <li>
+            <a href="savings.html"><i class="fa-solid fa-piggy-bank"></i> <span>Savings Vaults</span></a>
+          </li>
+          <li>
+            <a href="charity.html"><i class="fa-regular fa-heart"></i> <span>Charity  Tracker</span></a>
+          </li>
+          <li>
+            <a href="search.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></a>
+          </li>
+          <li>
+            <a href="ai-bestie.html"><i class="fa-regular fa-message"></i> <span>AI Bestie</span></a>
+          </li>
+          <li>
+            <a href="settings.html"><i class="fa-solid fa-gear"></i> <span>Settings</span></a>
+          </li>
+        </ul>
+      </nav>
+      <!-- Sidebar Footer User Profile -->
+      <div class="sidebar-footer">
+        <div class="collapse-btn" id="logoutBtn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
+        </div>
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <h4 id="userName">Loading...</h4>
+            <p id="userEmail">Loading...</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Analytics Content -->
+    <main class="main-content">
+      <header class="top-header">
+        <h2>Analytics</h2>
+        <div class="header-actions">
+          <div class="date-selector">
+            <i class="fa-regular fa-calendar"></i>
+            <span id="dateRangeText">Loading...</span>
+            <i class="fa-solid fa-chevron-down arrow-down"></i>
+          </div>
+          <button class="btn-export"><i class="fa-solid fa-arrow-down"></i> Export</button>
+          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
+        </div>
+      </header>
+
+      <div class="dashboard-body">
+
+        <!-- Filter Bar -->
+        <div class="analytics-filter-row">
+          <div class="segmented-control">
+            <button class="seg-btn">Weekly</button>
+            <button class="seg-btn active">Monthly</button>
+            <button class="seg-btn">Custom Range</button>
+          </div>
+          <button class="btn-export-pill"><i class="fa-solid fa-arrow-down"></i> Export</button>
+        </div>
+
+        <!-- 2 Column Charts Grid -->
+        <div class="charts-grid">
+
+          <!-- Column 1: Donut Chart -->
+          <div class="analytics-card">
+            <div class="card-head">
+              <h3 id="categoryTitle">Loading...</h3>
+              <p id="categorySubtitle">Loading...</p>
+            </div>
+
+            <div class="donut-chart-box">
+              <canvas id="categoryDonutChart"></canvas>
+            </div>
+
+            <!-- Category List Rendered by JS -->
+            <div class="category-breakdown-list" id="categoryBreakdownContainer"></div>
+          </div>
+
+          <!-- Column 2: Monthly Trend Bar Chart -->
+          <div class="analytics-card">
+            <div class="card-head">
+              <h3 id="trendTitle">Loading...</h3>
+              <p id="trendSubtitle">Loading...</p>
+            </div>
+
+            <div class="bar-chart-box">
+              <canvas id="monthlyTrendChart"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- AI Insights Section -->
+        <div class="ai-insights-section">
+          <div class="insights-title">
+            <i class="fa-solid fa-robot"></i> <span>AI Insights</span>
+          </div>
+          <!-- Insight Cards Rendered by JS -->
+          <div class="insights-grid" id="insightsContainer"></div>
+        </div>
+
+      </div>
+
+      <a href="#" class="help-btn" title="Need help?"><i class="fa-solid fa-question"></i></a>
+    </main>
+  </div>
+
+  <!-- External JS Script -->
+  <script src="js/analytics.js"></script>
+  <script src="js/expense-modal.js"></script>
+</body>
+
+</html>

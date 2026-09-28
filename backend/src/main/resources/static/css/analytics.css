@@ -1,0 +1,426 @@
+/* --------- Base Styles ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+:root {
+  --primary: #14806c;
+  --sidebar-bg: #071f20;
+  --sidebar-hover: #102e30;
+  --body-bg: #f8fafc;
+  --border-light: #eef2f6;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+}
+
+body {
+  background-color: var(--body-bg);
+  color: var(--text-dark);
+}
+
+.dashboard-wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --------- Sidebar Navigation ---------- */
+.sidebar {
+  width: 255px;
+  background-color: var(--sidebar-bg);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background-color: #19957d;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.btn-add-expense {
+  background-color: #16967e;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-nav ul { list-style: none; }
+.sidebar-nav li { position: relative; margin-bottom: 4px; }
+.sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.88rem;
+  padding: 9px 12px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.sidebar-nav li:hover a,
+.sidebar-nav li.active a {
+  color: #ffffff;
+  background-color: var(--sidebar-hover);
+}
+
+.active-dot {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #2dd4bf;
+  border-radius: 50%;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1rem;
+}
+
+.collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 8px 10px;
+  margin-bottom: 0.8rem;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #16967e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.user-info h4 { font-size: 0.85rem; font-weight: 600; }
+.user-info p { font-size: 0.72rem; color: #64748b; }
+
+/* --------- Main Content Area ---------- */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.top-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  padding: 1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.top-header h2 { font-size: 1.25rem; font-weight: 700; }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+
+.date-selector {
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  background-color: #fff;
+}
+
+.btn-export {
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #475569;
+  cursor: pointer;
+}
+
+.notification-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.dashboard-body { padding: 2rem 2.5rem; }
+
+/* --------- Filter Bar ---------- */
+.analytics-filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.segmented-control {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 4px;
+  display: inline-flex;
+}
+
+.seg-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.seg-btn.active {
+  background-color: #14806c;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-export-pill {
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #475569;
+}
+
+/* --------- 2-Column Charts Grid ---------- */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  align-items: start;
+}
+
+.analytics-card {
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.analytics-card .card-head h3 { font-size: 1rem; font-weight: 700; }
+.analytics-card .card-head p { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+
+/* Fixed Box Dimensions for Charts to Prevent Canvas Overflow */
+.donut-chart-box {
+  width: 220px;
+  height: 220px;
+  margin: 1rem auto;
+  position: relative;
+}
+
+.bar-chart-box {
+  width: 100%;
+  height: 380px;
+  position: relative;
+  margin-top: 1rem;
+}
+
+/* Category List Under Donut Chart */
+.category-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1rem;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.breakdown-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.breakdown-right {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.breakdown-right span {
+  color: #64748b;
+  font-size: 0.82rem;
+  width: 32px;
+  text-align: right;
+}
+
+.breakdown-right strong {
+  color: #0f172a;
+  font-size: 0.88rem;
+  width: 65px;
+  text-align: right;
+}
+
+/* --------- AI Insights Grid ---------- */
+.ai-insights-section { margin-top: 1.5rem; }
+.insights-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 1rem;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+}
+
+.insight-card {
+  background: white;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.insight-icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.insight-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+.insight-card p { font-size: 0.76rem; color: #64748b; line-height: 1.45; margin-bottom: 1.2rem; }
+
+.insight-actions { display: flex; gap: 8px; align-items: center; }
+.btn-insight {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-close-insight {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.help-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  background: white;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  text-decoration: none;
+}
+
+@media (max-width: 1150px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .insights-grid { grid-template-columns: repeat(2, 1fr); }
+}

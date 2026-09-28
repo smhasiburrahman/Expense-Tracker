@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboarding - Financial Bestie</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/onboarding.css" />
+</head>
+<body>
+
+  <div class="onboarding-container">
+    <div class="onboarding-header">
+      <div class="brand-icon"><i class="fa-solid fa-wallet"></i> Financial Bestie</div>
+      <button class="btn-skip" id="skipBtn">Skip for now</button>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="step-indicator">
+        <span class="active" id="ind-1">1</span>
+        <span id="ind-2">2</span>
+        <span id="ind-3">3</span>
+        <span id="ind-4">4</span>
+      </div>
+    </div>
+
+    <div class="step-container">
+      
+      <!-- STEP 1: Income -->
+      <div class="step-card active" id="step-1">
+        <h2>What's your monthly income?</h2>
+        <p>This helps us calculate your daily allowance and savings goals.</p>
+        <div class="form-group">
+          <label>Monthly Income (BDT)</label>
+          <input type="number" id="incomeInput" placeholder="e.g. 50000" />
+        </div>
+        <button class="btn-primary" onclick="nextStep(2)">Continue <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+
+      <!-- STEP 2: Categories -->
+      <div class="step-card" id="step-2">
+        <h2>Set up your budget categories</h2>
+        <p>Here are some predefined categories. You can also add custom ones.</p>
+        <div class="categories-list" id="onboardingCategories">
+          <!-- Pre-defined categories will be injected by JS or hardcoded -->
+          <div class="cat-pill"><i class="fa-solid fa-utensils"></i> Food & Dining</div>
+          <div class="cat-pill"><i class="fa-solid fa-car"></i> Transport</div>
+          <div class="cat-pill"><i class="fa-solid fa-basket-shopping"></i> Groceries</div>
+          <div class="cat-pill"><i class="fa-solid fa-bolt"></i> Utilities</div>
+          <div class="cat-pill"><i class="fa-solid fa-bag-shopping"></i> Shopping</div>
+        </div>
+        
+        <div class="custom-add-box">
+          <h4>Add Custom Category</h4>
+          <input type="text" id="catName" placeholder="Category Name" />
+          <input type="number" id="catBudget" placeholder="Monthly Budget Cap" />
+          <input type="color" id="catColor" value="#4CAF50" />
+          <button class="btn-secondary" onclick="addCustomCategory()">Add</button>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn-secondary" onclick="prevStep(1)">Back</button>
+          <button class="btn-primary" onclick="nextStep(3)">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Wallets -->
+      <div class="step-card" id="step-3">
+        <h2>Add your wallets</h2>
+        <p>Where do you keep your money? (e.g. Bkash, Cash, Bank)</p>
+        
+        <div class="custom-add-box">
+          <input type="text" id="walletName" placeholder="Wallet Name (e.g. bKash)" />
+          <input type="number" id="walletBalance" placeholder="Opening Balance" />
+          <input type="color" id="walletColor" value="#E91E63" />
+          <button class="btn-secondary" onclick="addWallet()">Add Wallet</button>
+        </div>
+
+        <div class="wallets-list" id="walletsContainer"></div>
+
+        <div class="nav-buttons">
+          <button class="btn-secondary" onclick="prevStep(2)">Back</button>
+          <button class="btn-primary" onclick="nextStep(4)">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Recurring Transactions -->
+      <div class="step-card" id="step-4">
+        <h2>Add recurring transactions</h2>
+        <p>Subscriptions, rent, or bills that happen regularly.</p>
+        
+        <div class="custom-add-box">
+          <input type="text" id="recName" placeholder="e.g. Netflix" />
+          <input type="number" id="recAmount" placeholder="Amount" />
+          <select id="recFreq">
+            <option value="MONTHLY">Monthly</option>
+            <option value="WEEKLY">Weekly</option>
+            <option value="YEARLY">Yearly</option>
+          </select>
+          <input type="date" id="recDate" />
+          <button class="btn-secondary" onclick="addRecurring()">Add</button>
+        </div>
+
+        <div class="recurring-list" id="recurringContainer"></div>
+
+        <div class="nav-buttons">
+          <button class="btn-secondary" onclick="prevStep(3)">Back</button>
+          <button class="btn-primary" onclick="finishOnboarding()">Finish Setup <i class="fa-solid fa-check"></i></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/onboarding.js"></script>
+</body>
+</html>

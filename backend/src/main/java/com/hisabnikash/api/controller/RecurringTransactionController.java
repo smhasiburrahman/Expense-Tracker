@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/recurring")
+@Transactional
 public class RecurringTransactionController {
 
     private final RecurringTransactionRepository recurringTransactionRepository;

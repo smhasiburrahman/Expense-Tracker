@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @RestController
 @RequestMapping("/api/wallets")
+@Transactional
 public class WalletController {
 
     private final WalletRepository walletRepository;

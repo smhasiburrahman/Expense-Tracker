@@ -21,7 +21,7 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "base_currency_code", referencedColumnName = "currency_code", nullable = false)
     private Currency baseCurrency;
 
@@ -37,8 +37,11 @@ public class User {
     @Column(name = "notify_budget_alerts", nullable = false)
     private Boolean notifyBudgetAlerts = true;
 
-    @Column(name = "notify_periodic_summary", nullable = false)
-    private Boolean notifyPeriodicSummary = true;
+    @Column(name = "notify_daily_summary", nullable = false)
+    private Boolean notifyDailySummary = true;
+
+    @Column(name = "notify_weekly_report", nullable = false)
+    private Boolean notifyWeeklyReport = true;
 
     @Column(name = "notify_savings_goals", nullable = false)
     private Boolean notifySavingsGoals = true;

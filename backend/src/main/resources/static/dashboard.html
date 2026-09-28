@@ -11,7 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/toast.css" />
   <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/topbar.css" />
 </head>
 <body>
 
@@ -72,10 +74,10 @@
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
         </div>
         <div class="user-profile">
-          <div class="avatar" id="userAvatar">Hr</div>
+          <div class="avatar" id="userAvatar">U</div>
           <div class="user-info">
-            <h4 id="userName">Hasibur Rahman</h4>
-            <p id="userEmail">rahim@example.com</p>
+            <h4 id="userName">User</h4>
+            <p id="userEmail"></p>
           </div>
         </div>
       </div>
@@ -87,17 +89,23 @@
       <!-- Top Header Bar -->
       <header class="top-header">
         <h2>Dashboard</h2>
-        <div class="header-actions">
-          <div class="date-selector">
-            <i class="fa-regular fa-calendar"></i>
-            <span id="selectedDateRange">Jul 1 — Jul 25, 2025</span>
-            <i class="fa-solid fa-chevron-down arrow-down"></i>
+        <div class="global-topbar-actions header-actions" id="globalTopbarActions">
+          <div class="calendar-container" id="globalCalendarContainer">
+            <button class="topbar-date-btn date-selector" id="topbarCalendarBtn" type="button" title="Interactive Calendar" aria-label="Open Calendar">
+              <i class="fa-regular fa-calendar topbar-cal-icon"></i>
+              <span class="topbar-date-text" id="topbarDateDisplay">Sep 1, 2026 — Sep 30, 2026</span>
+              <i class="fa-solid fa-chevron-down topbar-chevron-icon arrow-down"></i>
+            </button>
           </div>
-          <button class="btn-export" id="exportBtn">
-            <i class="fa-solid fa-arrow-down"></i> Export
+          <button class="topbar-export-btn btn-export" id="topbarExportBtn" type="button" title="Export" aria-label="Export">
+            <i class="fa-solid fa-arrow-down topbar-export-icon"></i>
+            <span>Export</span>
           </button>
-          <div class="notification-icon">
-            <i class="fa-regular fa-bell"></i>
+          <div class="notification-container" id="globalNotificationContainer">
+            <button class="topbar-notif-btn notification-icon" id="topbarNotificationBtn" type="button" title="Notifications" aria-label="Notifications">
+              <i class="fa-regular fa-bell topbar-bell-icon"></i>
+              <span class="notification-badge" id="topbarNotificationBadge" style="display: none;">0</span>
+            </button>
           </div>
         </div>
       </header>
@@ -107,12 +115,12 @@
         <!-- Greeting Header -->
         <div class="greeting-row">
           <div>
-            <h1 id="greetingHeading">Good afternoon, Hasib 👋</h1>
-            <p id="greetingSub">Here's your financial snapshot for July 2025</p>
+            <h1 id="greetingHeading">Welcome back 👋</h1>
+            <p id="greetingSub">Here's your financial snapshot</p>
           </div>
           <div class="month-pill">
             <button class="nav-arrow" id="prevMonthBtn"><i class="fa-solid fa-chevron-left"></i></button>
-            <span id="currentMonthText">July 2025</span>
+            <span id="currentMonthText">This Month</span>
             <button class="nav-arrow" id="nextMonthBtn"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
@@ -159,6 +167,7 @@
                   <th>WALLET <i class="fa-solid fa-chevron-down"></i></th>
                   <th>AMOUNT <i class="fa-solid fa-chevron-down"></i></th>
                   <th>DATE <i class="fa-solid fa-chevron-down"></i></th>
+                  <th style="text-align: right;">ACTION</th>
                 </tr>
               </thead>
               <tbody id="transactionBody"></tbody>
@@ -211,6 +220,66 @@
     </div>
   </div>
 
+  <!-- Edit Transaction Modal -->
+  <div class="modal-backdrop" id="editTxModal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(2px); z-index: 99999;">
+    <div class="modal-card" style="background: #ffffff; max-width: 520px; width: 92%; border-radius: 16px; padding: 1.8rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+        <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-pen-to-square" style="color: #2563eb;"></i> Edit Transaction
+        </h3>
+        <button type="button" class="btn-close-modal" onclick="closeDashboardEditModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+      <form id="dashboardEditTxForm">
+        <input type="hidden" id="dashEditTxId" />
+        <input type="hidden" id="dashEditTxType" />
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Amount (৳)</label>
+          <input type="number" step="0.01" min="0.01" id="dashEditTxAmount" class="text-input" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; font-weight: 600;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Description</label>
+          <input type="text" id="dashEditTxDesc" class="text-input" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Wallet</label>
+            <select id="dashEditTxWallet" required style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: white;">
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Category</label>
+            <select id="dashEditTxCategory" style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: white;">
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Transaction Date</label>
+          <input type="date" id="dashEditTxDate" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem;" />
+        </div>
+
+        <div style="margin-bottom: 1.4rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Note / Remarks (Optional)</label>
+          <input type="text" id="dashEditTxNote" placeholder="Additional details..." style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem;" />
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+          <button type="button" onclick="closeDashboardEditModal()" style="padding: 9px 18px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; border-radius: 8px; font-weight: 600; cursor: pointer;">Cancel</button>
+          <button type="submit" id="saveDashEditTxBtn" style="padding: 9px 20px; background: #2563eb; color: #ffffff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/toast.js"></script>
+  <script src="js/user-profile.js"></script>
+  <script src="js/localization.js"></script>
+  <script src="js/topbar.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/expense-modal.js"></script>
 </body>

@@ -12,10 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/savings")
+@Transactional
 public class SavingsVaultController {
 
     private final SavingsVaultRepository savingsVaultRepository;
@@ -23,17 +26,20 @@ public class SavingsVaultController {
     private final WalletRepository walletRepository;
     private final com.hisabnikash.api.repository.TransactionRepository transactionRepository;
     private final com.hisabnikash.api.repository.CurrencyRepository currencyRepository;
+    private final com.hisabnikash.api.service.NotificationService notificationService;
 
     public SavingsVaultController(SavingsVaultRepository savingsVaultRepository, 
                                   UserRepository userRepository, 
                                   WalletRepository walletRepository,
                                   com.hisabnikash.api.repository.TransactionRepository transactionRepository,
-                                  com.hisabnikash.api.repository.CurrencyRepository currencyRepository) {
+                                  com.hisabnikash.api.repository.CurrencyRepository currencyRepository,
+                                  com.hisabnikash.api.service.NotificationService notificationService) {
         this.savingsVaultRepository = savingsVaultRepository;
         this.userRepository = userRepository;
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
         this.currencyRepository = currencyRepository;
+        this.notificationService = notificationService;
     }
 
     private User getAuthenticatedUser(Authentication authentication) {
@@ -61,6 +67,7 @@ public class SavingsVaultController {
         vault.setTargetDate(req.getTargetDate());
         
         savingsVaultRepository.save(vault);
+        notificationService.broadcastNotifications(user.getId());
         return ResponseEntity.ok(vault);
     }
 
@@ -72,17 +79,27 @@ public class SavingsVaultController {
             return ResponseEntity.notFound().build();
         }
         
+        if (req.getAmount() == null || req.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Deposit amount must be greater than zero"));
+        }
+
         Wallet wallet = walletRepository.findById(req.getWalletId()).orElse(null);
         if (wallet == null || !wallet.getUser().getId().equals(user.getId())) {
-            return ResponseEntity.badRequest().body("Invalid wallet");
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Invalid wallet"));
+        }
+
+        BigDecimal walletBal = wallet.getCurrentBalance() != null ? wallet.getCurrentBalance() : BigDecimal.ZERO;
+        if (walletBal.compareTo(req.getAmount()) < 0) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Insufficient funds in selected wallet"));
         }
         
         // Deduct from wallet
-        wallet.setCurrentBalance(wallet.getCurrentBalance().subtract(req.getAmount()));
+        wallet.setCurrentBalance(walletBal.subtract(req.getAmount()));
         walletRepository.save(wallet);
         
         // Add to vault
-        vault.setInitialSavings(vault.getInitialSavings().add(req.getAmount()));
+        BigDecimal currentVaultSavings = vault.getInitialSavings() != null ? vault.getInitialSavings() : BigDecimal.ZERO;
+        vault.setInitialSavings(currentVaultSavings.add(req.getAmount()));
         savingsVaultRepository.save(vault);
         
         // Log transaction
@@ -97,11 +114,18 @@ public class SavingsVaultController {
         tx.setDescription("Deposit to " + vault.getName());
         
         String currencyCode = user.getBaseCurrency() != null ? user.getBaseCurrency().getCurrencyCode() : "BDT";
-        com.hisabnikash.api.entity.Currency currency = currencyRepository.findById(currencyCode).orElseThrow(() -> new RuntimeException("Currency not found"));
+        com.hisabnikash.api.entity.Currency currency = currencyRepository.findById(currencyCode).orElse(null);
+        if (currency == null) {
+            currency = currencyRepository.findAll().stream().findFirst().orElse(null);
+        }
         tx.setOriginalCurrency(currency);
         
         transactionRepository.save(tx);
-        
+        try {
+            notificationService.broadcastNotifications(user.getId());
+        } catch (Throwable e) {
+            System.err.println("Warning: failed to broadcast notifications after deposit: " + e.getMessage());
+        }
         return ResponseEntity.ok(vault);
     }
 }

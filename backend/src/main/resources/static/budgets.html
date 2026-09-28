@@ -10,7 +10,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
+  <link rel="stylesheet" href="css/toast.css" />
   <link rel="stylesheet" href="css/budgets.css" />
+  <link rel="stylesheet" href="css/topbar.css" />
 </head>
 <body>
 
@@ -50,10 +52,10 @@
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
         </div>
         <div class="user-profile">
-          <div class="avatar" id="userAvatar">R</div>
+          <div class="avatar" id="userAvatar">U</div>
           <div class="user-info">
-            <h4 id="userName">Rahim Uddin</h4>
-            <p id="userEmail">rahim@example.com</p>
+            <h4 id="userName">User</h4>
+            <p id="userEmail"></p>
           </div>
         </div>
       </div>
@@ -63,14 +65,24 @@
     <main class="main-content">
       <header class="top-header">
         <h2>Budgets & Categories</h2>
-        <div class="header-actions">
-          <div class="date-selector">
-            <i class="fa-regular fa-calendar"></i>
-            <span id="dateRangeText">Jul 1 — Jul 25, 2025</span>
-            <i class="fa-solid fa-chevron-down arrow-down"></i>
+        <div class="global-topbar-actions header-actions" id="globalTopbarActions">
+          <div class="calendar-container" id="globalCalendarContainer">
+            <button class="topbar-date-btn date-selector" id="topbarCalendarBtn" type="button" title="Interactive Calendar" aria-label="Open Calendar">
+              <i class="fa-regular fa-calendar topbar-cal-icon"></i>
+              <span class="topbar-date-text" id="topbarDateDisplay">Sep 1, 2026 — Sep 30, 2026</span>
+              <i class="fa-solid fa-chevron-down topbar-chevron-icon arrow-down"></i>
+            </button>
           </div>
-          <button class="btn-export"><i class="fa-solid fa-arrow-down"></i> Export</button>
-          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
+          <button class="topbar-export-btn btn-export" id="topbarExportBtn" type="button" title="Export" aria-label="Export">
+            <i class="fa-solid fa-arrow-down topbar-export-icon"></i>
+            <span>Export</span>
+          </button>
+          <div class="notification-container" id="globalNotificationContainer">
+            <button class="topbar-notif-btn notification-icon" id="topbarNotificationBtn" type="button" title="Notifications" aria-label="Notifications">
+              <i class="fa-regular fa-bell topbar-bell-icon"></i>
+              <span class="notification-badge" id="topbarNotificationBadge" style="display: none;">0</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -198,6 +210,28 @@
           </div>
         </div>
 
+        <!-- Limit Type Selector -->
+        <div class="form-group">
+          <label>LIMIT TYPE</label>
+          <div class="limit-type-selector-grid">
+            <div class="limit-option active" data-limit="SOFT" id="limitOptSoft">
+              <div class="limit-opt-header">
+                <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i>
+                <span>Soft Limit</span>
+              </div>
+              <p class="limit-opt-desc">Allows spending past limit, triggers alerts & warnings</p>
+            </div>
+            <div class="limit-option" data-limit="HARD" id="limitOptHard">
+              <div class="limit-opt-header">
+                <i class="fa-solid fa-ban" style="color: #ef4444;"></i>
+                <span>Hard Limit</span>
+              </div>
+              <p class="limit-opt-desc">Strictly blocks new expenses exceeding monthly cap</p>
+            </div>
+          </div>
+          <input type="hidden" id="catLimitTypeInput" value="SOFT" />
+        </div>
+
         <!-- Real-time Preview Box -->
         <div class="category-preview-card">
           <div class="preview-left">
@@ -206,10 +240,10 @@
             </div>
             <div>
               <h4 id="catPreviewName">Category Name</h4>
-              <p id="catPreviewCap">Budget cap: ৳0</p>
+              <p id="catPreviewCap">Budget cap: ৳0 &bull; Soft Limit</p>
             </div>
           </div>
-          <span class="preview-badge">On Track</span>
+          <span class="preview-badge" id="catPreviewLimitBadge">Soft</span>
         </div>
 
         <div class="modal-footer">
@@ -306,7 +340,10 @@
     </div>
   </div>
 
+  <script src="js/toast.js"></script>
   <script src="js/user-profile.js"></script>
+  <script src="js/localization.js"></script>
+  <script src="js/topbar.js"></script>
   <script src="js/budgets.js"></script>
   <script src="js/expense-modal.js"></script>
 

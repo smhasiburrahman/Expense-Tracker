@@ -11,7 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- External CSS -->
+  <link rel="stylesheet" href="css/toast.css" />
   <link rel="stylesheet" href="css/charity.css" />
+  <link rel="stylesheet" href="css/topbar.css" />
 </head>
 <body>
 
@@ -52,10 +54,10 @@
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
         </div>
         <div class="user-profile">
-          <div class="avatar" id="userAvatar">R</div>
+          <div class="avatar" id="userAvatar">U</div>
           <div class="user-info">
-            <h4 id="userName">Rahim Uddin</h4>
-            <p id="userEmail">rahim@example.com</p>
+            <h4 id="userName">User</h4>
+            <p id="userEmail"></p>
           </div>
         </div>
       </div>
@@ -65,14 +67,24 @@
     <main class="main-content">
       <header class="top-header">
         <h2>Charity Tracker</h2>
-        <div class="header-actions">
-          <div class="date-selector">
-            <i class="fa-regular fa-calendar"></i>
-            <span id="dateRangeText">Jul 1 — Jul 25, 2025</span>
-            <i class="fa-solid fa-chevron-down arrow-down"></i>
+        <div class="global-topbar-actions header-actions" id="globalTopbarActions">
+          <div class="calendar-container" id="globalCalendarContainer">
+            <button class="topbar-date-btn date-selector" id="topbarCalendarBtn" type="button" title="Interactive Calendar" aria-label="Open Calendar">
+              <i class="fa-regular fa-calendar topbar-cal-icon"></i>
+              <span class="topbar-date-text" id="topbarDateDisplay">Sep 1, 2026 — Sep 30, 2026</span>
+              <i class="fa-solid fa-chevron-down topbar-chevron-icon arrow-down"></i>
+            </button>
           </div>
-          <button class="btn-export"><i class="fa-solid fa-arrow-down"></i> Export</button>
-          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
+          <button class="topbar-export-btn btn-export" id="topbarExportBtn" type="button" title="Export" aria-label="Export">
+            <i class="fa-solid fa-arrow-down topbar-export-icon"></i>
+            <span>Export</span>
+          </button>
+          <div class="notification-container" id="globalNotificationContainer">
+            <button class="topbar-notif-btn notification-icon" id="topbarNotificationBtn" type="button" title="Notifications" aria-label="Notifications">
+              <i class="fa-regular fa-bell topbar-bell-icon"></i>
+              <span class="notification-badge" id="topbarNotificationBadge" style="display: none;">0</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -127,7 +139,7 @@
                 <th>WALLET</th>
                 <th>AMOUNT</th>
                 <th>DATE</th>
-                <th></th>
+                <th style="text-align: right;">ACTION</th>
               </tr>
             </thead>
             <!-- Dynamic Rows -->
@@ -157,7 +169,7 @@
           <label>AMOUNT</label>
           <div class="amount-input-box">
             <span class="currency-symbol">৳</span>
-            <input type="number" id="sadaqaAmountInput" placeholder="0" required min="1" />
+            <input type="number" id="sadaqaAmountInput" placeholder="0" required min="1" step="0.01" />
           </div>
           <!-- Quick Amount Buttons -->
           <div class="quick-amounts">
@@ -221,7 +233,90 @@
     </div>
   </div>
 
+  <!-- Modal: Edit Charity Contribution -->
+  <div class="modal-backdrop" id="editCharityModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="modal-heart" style="background: #eff6ff; color: #2563eb;"><i class="fa-solid fa-pen-to-square"></i></span>
+          <h3>Edit Charity Contribution</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="closeEditModalBtn">&times;</button>
+      </div>
+
+      <form id="editCharityForm">
+        <input type="hidden" id="editCharityId" />
+
+        <!-- Amount Input -->
+        <div class="form-group">
+          <label>AMOUNT</label>
+          <div class="amount-input-box">
+            <span class="currency-symbol">৳</span>
+            <input type="number" id="editCharityAmountInput" placeholder="0" required min="0.01" step="0.01" />
+          </div>
+          <!-- Quick Amount Buttons -->
+          <div class="quick-amounts">
+            <button type="button" class="quick-btn edit-quick-btn" data-val="100">৳100</button>
+            <button type="button" class="quick-btn edit-quick-btn" data-val="200">৳200</button>
+            <button type="button" class="quick-btn edit-quick-btn" data-val="500">৳500</button>
+            <button type="button" class="quick-btn edit-quick-btn" data-val="1000">৳1000</button>
+            <button type="button" class="quick-btn edit-quick-btn" data-val="2000">৳2000</button>
+          </div>
+        </div>
+
+        <!-- Description Input -->
+        <div class="form-group">
+          <label>DESCRIPTION</label>
+          <input type="text" class="text-input" id="editCharityDescInput" placeholder="e.g. Weekly Jumu'ah Sadaqa, Orphanage Donation" required />
+        </div>
+
+        <!-- Category Selector -->
+        <div class="form-group">
+          <label>CATEGORY</label>
+          <div class="category-pills" id="editCategoryPillsContainer">
+            <button type="button" class="cat-pill edit-cat-pill active" data-cat="Mosque">Mosque</button>
+            <button type="button" class="cat-pill edit-cat-pill" data-cat="Disaster Relief">Disaster Relief</button>
+            <button type="button" class="cat-pill edit-cat-pill" data-cat="Children">Children</button>
+            <button type="button" class="cat-pill edit-cat-pill" data-cat="Education">Education</button>
+            <button type="button" class="cat-pill edit-cat-pill" data-cat="Food">Food</button>
+            <button type="button" class="cat-pill edit-cat-pill" data-cat="Healthcare">Healthcare</button>
+            <button type="button" class="cat-pill edit-cat-pill" data-cat="Regular">Regular</button>
+            <button type="button" class="cat-pill edit-cat-pill" data-cat="Other">Other</button>
+          </div>
+        </div>
+
+        <!-- Wallet & Date Row -->
+        <div class="form-row-two">
+          <div class="form-group">
+            <label>WALLET</label>
+            <div class="select-wallet-box">
+              <i class="fa-solid fa-money-bill-1 wallet-icon-field"></i>
+              <select id="editCharityWalletSelect" required>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>DATE</label>
+            <input type="date" class="text-input" id="editCharityDateInput" required />
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="cancelEditModalBtn">Cancel</button>
+          <button type="submit" class="btn-submit-sadaqa" id="saveEditCharityBtn" style="background: #2563eb;">
+            <i class="fa-solid fa-check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- External JS Script -->
+  <script src="js/toast.js"></script>
+  <script src="js/user-profile.js"></script>
+  <script src="js/localization.js"></script>
+  <script src="js/topbar.js"></script>
   <script src="js/charity.js"></script>
   <script src="js/expense-modal.js"></script>
 

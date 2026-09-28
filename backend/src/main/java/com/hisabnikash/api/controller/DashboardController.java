@@ -21,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class DashboardController {
 
     private final UserRepository userRepository;

@@ -7,4 +7,5 @@ public class CategoryRequest {
     private String icon;
     private String colorHex;
     private BigDecimal monthlyBudgetCap;
+    private String limitType;
 }

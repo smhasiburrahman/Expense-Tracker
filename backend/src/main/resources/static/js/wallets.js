@@ -55,7 +55,7 @@ function renderWallets() {
       </div>
 
       <span class="wallet-box-name">${w.name}</span>
-      <h3 class="wallet-box-amount">৳${w.balance.toLocaleString()}</h3>
+      <h3 class="wallet-box-amount">${window.Localization ? window.Localization.formatMoney(w.balance, 'BDT') : `৳${w.balance.toLocaleString()}`}</h3>
 
       <div class="wallet-bar-chart">
         ${w.heights.map(h => `<span style="height: ${h}%; background: ${w.color}; opacity: 0.65;"></span>`).join('')}
@@ -88,8 +88,10 @@ function renderTransactions() {
       const catIcon = t.category ? t.category.icon : '💸';
       const catColor = t.category ? t.category.colorHex : '#94a3b8';
       const isExpense = t.transactionType === 'EXPENSE';
-      const amountStr = `${isExpense ? '-' : '+'}৳${(t.convertedAmount || 0).toLocaleString()}`;
+      const prefix = isExpense ? '-' : '+';
+      const amountStr = `${prefix}${window.Localization ? window.Localization.formatMoney(t.convertedAmount || 0, 'BDT') : `৳${(t.convertedAmount || 0).toLocaleString()}`}`;
       const amountColor = isExpense ? 'amount-minus' : '';
+      const formattedDate = window.Localization ? window.Localization.formatDate(t.transactionDate) : (t.transactionDate || '');
       
       return `
         <tr>
@@ -97,7 +99,7 @@ function renderTransactions() {
           <td><strong>${t.description || 'No description'}</strong></td>
           <td><span class="wallet-badge">${t.wallet ? t.wallet.name : '-'}</span></td>
           <td class="${amountColor}">${amountStr}</td>
-          <td class="date-col">${t.transactionDate}</td>
+          <td class="date-col">${formattedDate}</td>
           <td>
             <div style="display: flex; gap: 10px;">
               <button onclick="editTransaction(${t.id})" style="background: none; border: none; color: #3b82f6; cursor: pointer;"><i class="fa-solid fa-pen"></i></button>
@@ -110,53 +112,126 @@ function renderTransactions() {
 }
 
 window.deleteTransaction = async function(id) {
-    if (confirm("Are you sure you want to delete this transaction? The amount will be refunded to your wallet.")) {
+    const tx = walletTransactions.find(t => t.id === id);
+    const desc = tx ? `"${tx.description || 'Transaction'}"` : 'this transaction';
+    const amount = tx ? (window.Localization ? window.Localization.formatMoney(tx.convertedAmount || tx.originalAmount || 0, 'BDT') : `৳${parseFloat(tx.convertedAmount || 0).toLocaleString()}`) : '';
+    const wallet = tx && tx.wallet ? `wallet "${tx.wallet.name}"` : 'your wallet';
+
+    const confirmed = confirm(
+        `Are you sure you want to delete ${desc} (${amount})?\n\n` +
+        `This will completely remove it from the system and:\n` +
+        `• Refund ${amount} back to ${wallet}\n` +
+        `• Update category spending and budget progress\n` +
+        `• Recalculate your dashboard and analytics\n` +
+        `• Remove it from transaction history`
+    );
+
+    if (confirmed) {
         const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Your session has expired. Please log in again.');
+            window.location.href = 'index.html';
+            return;
+        }
         try {
             const res = await fetch(`/api/transactions/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (res.ok) {
-                alert("Transaction deleted successfully!");
+            if (res.ok || res.status === 404) {
                 await fetchWalletsData(); // re-fetch transactions and wallets
                 renderWallets();
                 renderTransactions();
+            } else if (res.status === 401) {
+                alert('Your session has expired. Please log in again.');
+                localStorage.removeItem('token');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            } else if (res.status === 403) {
+                alert('Permission denied: You do not have permission to delete this transaction.');
+                await fetchWalletsData();
+                renderWallets();
+                renderTransactions();
             } else {
-                alert("Failed to delete transaction.");
+                let errorMsg = 'Failed to delete transaction.';
+                try {
+                    const errData = await res.json();
+                    if (errData && errData.message) errorMsg = errData.message;
+                } catch (_) {}
+                alert(errorMsg);
             }
         } catch (e) {
             console.error(e);
+            alert('A network error occurred while deleting transaction.');
         }
     }
 };
 
-window.editTransaction = function(id) {
-    const tx = walletTransactions.find(t => t.id === id);
-    if (!tx) return;
-    
-    document.getElementById('editTxId').value = tx.id;
-    document.getElementById('editTxWalletId').value = tx.wallet ? tx.wallet.id : '';
-    document.getElementById('editTxCategoryId').value = tx.category ? tx.category.id : '';
-    document.getElementById('editTxAmount').value = tx.originalAmount || tx.convertedAmount;
-    document.getElementById('editTxDesc').value = tx.description || '';
-    document.getElementById('editTxDate').value = tx.transactionDate;
-    
-    document.getElementById('editTxModal').style.display = 'flex';
+window.editTransaction = async function(id) {
+    const token = localStorage.getItem('token');
+    try {
+        const [walletsRes, catsRes, txRes] = await Promise.all([
+            fetch('/api/wallets', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('/api/categories', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch(`/api/transactions/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+
+        const wallets = await walletsRes.json();
+        const categories = await catsRes.json();
+        const tx = await txRes.json();
+
+        const walletSelect = document.getElementById('editTxWalletSelect');
+        const formatAmount = amt => window.Localization ? window.Localization.formatMoney(amt, 'BDT') : `৳${(amt || 0).toLocaleString()}`;
+        walletSelect.innerHTML = (wallets || []).map(w => `<option value="${w.id}" ${w.id === tx.walletId ? 'selected' : ''}>${w.name} (${formatAmount(parseFloat(w.currentBalance || 0))})</option>`).join('');
+
+        const catSelect = document.getElementById('editTxCategorySelect');
+        catSelect.innerHTML = '<option value="">-- No Category --</option>' + (categories || []).map(c => `<option value="${c.id}" ${c.id === tx.categoryId ? 'selected' : ''}>${c.name}</option>`).join('');
+
+        const currentCur = window.Localization ? window.Localization.getCurrencyCode() : 'BDT';
+        const convertedAmt = window.Localization ? window.Localization.convert(parseFloat(tx.amount || tx.convertedAmount || 0), 'BDT', currentCur) : parseFloat(tx.amount || 0);
+
+        document.getElementById('editTxId').value = tx.id;
+        document.getElementById('editTxType').value = tx.transactionType || 'EXPENSE';
+        document.getElementById('editTxAmount').value = currentCur === 'JPY' ? Math.round(convertedAmt) : convertedAmt.toFixed(2);
+        document.getElementById('editTxDesc').value = tx.description || '';
+        document.getElementById('editTxDate').value = tx.transactionDate;
+        document.getElementById('editTxNote').value = tx.sourceNote || '';
+        
+        if (window.Localization) window.Localization.applyToDOM();
+
+        document.getElementById('editTxModal').style.display = 'flex';
+    } catch (err) {
+        console.error('Failed to load transaction for edit:', err);
+        alert('Failed to load transaction details.');
+    }
 };
 
 document.getElementById('editTxForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('editTxId').value;
+    const token = localStorage.getItem('token');
+
+    const enteredAmount = Number(document.getElementById('editTxAmount').value);
+    const currentCur = window.Localization ? window.Localization.getCurrencyCode() : 'BDT';
+    const amountInBDT = window.Localization ? window.Localization.convert(enteredAmount, currentCur, 'BDT') : enteredAmount;
+
     const req = {
-        amount: Number(document.getElementById('editTxAmount').value),
+        amount: amountInBDT,
         description: document.getElementById('editTxDesc').value,
+        walletId: Number(document.getElementById('editTxWalletSelect').value) || null,
+        categoryId: Number(document.getElementById('editTxCategorySelect').value) || null,
         transactionDate: document.getElementById('editTxDate').value,
-        walletId: Number(document.getElementById('editTxWalletId').value) || null,
-        categoryId: Number(document.getElementById('editTxCategoryId').value) || null
+        sourceNote: document.getElementById('editTxNote').value,
+        transactionType: document.getElementById('editTxType').value || 'EXPENSE'
     };
 
-    const token = localStorage.getItem('token');
+    const saveBtn = document.getElementById('saveWalletTxBtn');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    }
+
     try {
         const res = await fetch(`/api/transactions/${id}`, {
             method: 'PUT',
@@ -164,25 +239,74 @@ document.getElementById('editTxForm').addEventListener('submit', async (e) => {
             body: JSON.stringify(req)
         });
         if (res.ok) {
-            alert('Transaction updated successfully!');
             document.getElementById('editTxModal').style.display = 'none';
             await fetchWalletsData();
             renderWallets();
             renderTransactions();
+
+            // Check if updated category exceeds budget cap
+            if (req.categoryId && (!req.transactionType || req.transactionType === 'EXPENSE')) {
+                if (window.checkAndTriggerBudgetAlert) {
+                    await window.checkAndTriggerBudgetAlert(req.categoryId);
+                } else {
+                    try {
+                        const catRes = await fetch('/api/categories', { headers: { 'Authorization': `Bearer ${token}` } });
+                        if (catRes.ok) {
+                            const cats = await catRes.json();
+                            const cat = cats.find(c => Number(c.id) === Number(req.categoryId));
+                            if (cat) {
+                                const spent = parseFloat(cat.spent) || 0;
+                                const cap = parseFloat(cat.cap) || 0;
+                                const percent = cap > 0 ? Math.round((spent / cap) * 100) : 0;
+                                if (cap > 0 && (spent > cap || percent >= 100)) {
+                                    const budgetAlert = {
+                                        type: 'budget',
+                                        title: `Over Budget Alert: ${cat.name}`,
+                                        category: cat.name,
+                                        amountBDT: spent,
+                                        capBDT: cap,
+                                        percent: percent,
+                                        message: `${cat.name} has exceeded its monthly budget cap. Immediate attention recommended.`,
+                                        rawMessage: `${cat.name} has exceeded its monthly budget cap. Immediate attention recommended.`,
+                                        severity: 'danger',
+                                        icon: 'fa-solid fa-triangle-exclamation',
+                                        link: 'budgets.html'
+                                    };
+                                    if (window.handleApplicationEvent) {
+                                        window.handleApplicationEvent(budgetAlert);
+                                    } else {
+                                        window.dispatchEvent(new CustomEvent('applicationEvent', { detail: budgetAlert }));
+                                    }
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error verifying budget cap after transaction update:', err);
+                    }
+                }
+            }
         } else {
-            alert('Failed to update transaction.');
+            const errText = await res.text();
+            alert('Failed to update transaction: ' + (errText || 'Server error'));
         }
     } catch(err) {
         console.error(err);
+        alert('An error occurred while updating the transaction.');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Changes';
+        }
     }
 });
 
 function updateModalPreview() {
   const nameVal = document.getElementById('walletNameInput').value.trim() || 'Wallet Name';
   const balanceVal = Number(document.getElementById('walletBalanceInput').value) || 0;
+  const sym = window.Localization ? window.Localization.getCurrencySymbol() : '৳';
 
   document.getElementById('previewName').textContent = nameVal;
-  document.getElementById('previewBalance').textContent = `৳${balanceVal.toLocaleString()}`;
+  document.getElementById('previewBalance').textContent = `${sym}${balanceVal.toLocaleString()}`;
 
   const iconWrap = document.getElementById('previewIconWrap');
   iconWrap.style.backgroundColor = `${selectedColor}22`;
@@ -313,4 +437,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('token');
     window.location.href = 'index.html';
   });
+});
+
+// Listen for global localization changes
+window.addEventListener('localizationChanged', () => {
+  renderWallets();
+  renderTransactions();
+  if (window.Localization) window.Localization.applyToDOM();
 });

@@ -4,10 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Settings - Financial Bestie</title>
+  
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/toast.css" />
   <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/settings.css" />
+  <link rel="stylesheet" href="css/topbar.css" />
 </head>
 <body>
 
@@ -22,10 +29,12 @@
         </div>
       </div>
 
-      <button class="btn-add-expense" onclick="alert('Add Expense Modal')">
+      <!-- Add Expense Button -->
+      <button class="btn-add-expense" id="addExpenseBtn">
         <i class="fa-solid fa-plus"></i> Add Expense
       </button>
 
+      <!-- Sidebar Navigation Links -->
       <nav class="sidebar-nav">
         <ul>
           <li><a href="dashboard.html"><i class="fa-solid fa-table-columns"></i> <span>Dashboard</span></a></li>
@@ -33,22 +42,23 @@
           <li><a href="wallets.html"><i class="fa-regular fa-credit-card"></i> <span>Wallets</span></a></li>
           <li><a href="budgets.html"><i class="fa-solid fa-layer-group"></i> <span>Budgets & Categories</span></a></li>
           <li><a href="savings.html"><i class="fa-solid fa-piggy-bank"></i> <span>Savings Vaults</span></a></li>
-          <li><a href="charity.html"><i class="fa-regular fa-heart"></i> <span>Charity  Tracker</span></a></li>
+          <li><a href="charity.html"><i class="fa-regular fa-heart"></i> <span>Charity Tracker</span></a></li>
           <li><a href="search.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></a></li>
           <li><a href="ai-bestie.html"><i class="fa-regular fa-message"></i> <span>AI Bestie</span></a></li>
           <li class="active"><a href="settings.html"><i class="fa-solid fa-gear"></i> <span>Settings</span></a><span class="active-dot"></span></li>
         </ul>
       </nav>
 
+      <!-- Sidebar User Profile Footer -->
       <div class="sidebar-footer">
-        <div class="collapse-btn" onclick="window.location.href='index.html'">
+        <div class="collapse-btn" id="logoutBtn" title="Log Out">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
         </div>
         <div class="user-profile">
-          <div class="avatar">R</div>
+          <div class="avatar" id="userAvatar">U</div>
           <div class="user-info">
-            <h4>Rahim Uddin</h4>
-            <p>rahim@example.com</p>
+            <h4 id="userName">Loading...</h4>
+            <p id="userEmail">Loading...</p>
           </div>
         </div>
       </div>
@@ -58,63 +68,267 @@
     <main class="main-content">
       <header class="top-header">
         <h2>Settings</h2>
-        <div class="header-actions">
-          <div class="date-selector">
-            <i class="fa-regular fa-calendar"></i>
-            <span>Jul 1 — Jul 25, 2025</span>
-            <i class="fa-solid fa-chevron-down arrow-down"></i>
+        <div class="global-topbar-actions header-actions" id="globalTopbarActions">
+          <div class="calendar-container" id="globalCalendarContainer">
+            <button class="topbar-date-btn date-selector" id="topbarCalendarBtn" type="button" title="Interactive Calendar" aria-label="Open Calendar">
+              <i class="fa-regular fa-calendar topbar-cal-icon"></i>
+              <span class="topbar-date-text" id="topbarDateDisplay">Sep 1, 2026 — Sep 30, 2026</span>
+              <i class="fa-solid fa-chevron-down topbar-chevron-icon arrow-down"></i>
+            </button>
           </div>
-          <button class="btn-export"><i class="fa-solid fa-arrow-down"></i> Export</button>
-          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
+          <button class="topbar-export-btn btn-export" id="topbarExportBtn" type="button" title="Export" aria-label="Export">
+            <i class="fa-solid fa-arrow-down topbar-export-icon"></i>
+            <span>Export</span>
+          </button>
+          <div class="notification-container" id="globalNotificationContainer">
+            <button class="topbar-notif-btn notification-icon" id="topbarNotificationBtn" type="button" title="Notifications" aria-label="Notifications">
+              <i class="fa-regular fa-bell topbar-bell-icon"></i>
+              <span class="notification-badge" id="topbarNotificationBadge" style="display: none;">0</span>
+            </button>
+          </div>
         </div>
       </header>
 
       <div class="dashboard-body">
+        
+        <!-- Settings Layout Grid -->
         <div class="settings-grid">
           
-          <!-- Settings Navigation Tabs -->
-          <div class="settings-nav">
-            <div class="settings-nav-item active"><i class="fa-regular fa-user"></i> Account</div>
-            <div class="settings-nav-item"><i class="fa-solid fa-globe"></i> Currency & Region</div>
-            <div class="settings-nav-item"><i class="fa-regular fa-bell"></i> Notifications</div>
-            <div class="settings-nav-item"><i class="fa-solid fa-tag"></i> Categories</div>
-          </div>
+          <!-- Secondary Menu: Tab Navigation Buttons -->
+          <nav class="settings-nav" aria-label="Settings navigation">
+            <button type="button" class="settings-nav-item active" data-tab="panelAccount" id="navAccountBtn">
+              <i class="fa-regular fa-user"></i> <span>Account Settings</span>
+            </button>
+            <button type="button" class="settings-nav-item" data-tab="panelLocalization" id="navLocalizationBtn">
+              <i class="fa-solid fa-globe"></i> <span>Localization</span>
+            </button>
+            <button type="button" class="settings-nav-item" data-tab="panelNotifications" id="navNotificationsBtn">
+              <i class="fa-regular fa-bell"></i> <span>Notifications</span>
+            </button>
+            <button type="button" class="settings-nav-item" data-tab="panelSession" id="navSessionBtn">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Session & Logout</span>
+            </button>
+          </nav>
 
-          <!-- Account Settings Form -->
-          <div class="settings-card">
-            <h3>Account Settings</h3>
+          <!-- Main View: Dynamic Tabbed Panels (Only active panel is shown) -->
+          <div class="settings-content-stack">
             
-            <form id="settingsForm">
-              <div class="settings-form-group">
-                <label for="profileFullName">Full Name</label>
-                <input type="text" id="profileFullName" value="Rahim Uddin" required />
+            <!-- Global Feedback Alert Banner -->
+            <div id="settingsAlert" class="settings-alert" style="display: none;">
+              <div class="settings-alert-content">
+                <i id="settingsAlertIcon" class="fa-solid fa-circle-exclamation"></i>
+                <span id="settingsAlertMessage"></span>
               </div>
-
-              <div class="settings-form-group">
-                <label for="profileEmail">Email Address</label>
-                <input type="email" id="profileEmail" value="rahim@example.com" required />
-              </div>
-
-              <div class="settings-form-group">
-                <label for="monthlyIncome">Monthly Income (BDT)</label>
-                <input type="number" id="monthlyIncome" value="65000" required />
-              </div>
-
-              <button type="submit" class="btn-save-settings">Save Changes</button>
-            </form>
-
-            <div class="link-logout-red" onclick="window.location.href='index.html'">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+              <button type="button" class="settings-alert-close" onclick="closeSettingsAlert()">&times;</button>
             </div>
-          </div>
 
+            <!-- Panel 1: Account Settings -->
+            <div class="settings-tab-panel active" id="panelAccount">
+              <section class="settings-card" id="accountCard">
+                <div class="settings-card-header">
+                  <div>
+                    <h3><i class="fa-regular fa-user"></i> Account Settings</h3>
+                    <p class="settings-card-subtitle">View and update your personal details and monthly income baseline.</p>
+                  </div>
+                </div>
+
+                <form id="accountForm" novalidate>
+                  <div class="settings-form-row">
+                    <div class="settings-form-group">
+                      <label for="profileFullName">Full Name <span class="required-star">*</span></label>
+                      <input type="text" id="profileFullName" class="settings-input" placeholder="Your full name" required />
+                      <div class="input-hint">Your public display name within Financial Bestie</div>
+                    </div>
+
+                    <div class="settings-form-group">
+                      <label for="profileEmail">Email Address <span class="required-star">*</span></label>
+                      <input type="email" id="profileEmail" class="settings-input" placeholder="you@example.com" required />
+                      <div class="input-hint">Used for sign in and account security notifications</div>
+                    </div>
+                  </div>
+
+                  <div class="settings-form-group">
+                    <label for="monthlyIncome">Monthly Income <span class="required-star">*</span></label>
+                    <div class="income-input-group">
+                      <span class="income-prefix" id="currencyPrefix">৳</span>
+                      <input type="number" id="monthlyIncome" class="settings-input" placeholder="e.g. 75000" min="0" step="any" required />
+                    </div>
+                    <div class="input-hint">Baseline monthly income used for AI budgeting, savings ratios, and dashboard metrics</div>
+                  </div>
+
+                  <div style="margin-top: 1.75rem; display: flex; align-items: center; gap: 12px;">
+                    <button type="submit" class="btn-save-settings" id="saveAccountBtn">
+                      <i class="fa-solid fa-check"></i> Save Changes
+                    </button>
+                    <span id="saveAccountStatusHint" style="font-size: 0.85rem; color: #64748b;"></span>
+                  </div>
+                </form>
+              </section>
+            </div>
+
+            <!-- Panel 2: Localization -->
+            <div class="settings-tab-panel" id="panelLocalization" style="display: none;">
+              <section class="settings-card" id="localizationCard">
+                <div class="settings-card-header">
+                  <div>
+                    <h3><i class="fa-solid fa-globe"></i> Localization</h3>
+                    <p class="settings-card-subtitle">Select your preferred currency and region to determine how amounts and regional information are formatted.</p>
+                  </div>
+                </div>
+
+                <form id="localizationForm" novalidate>
+                  <div class="settings-form-row">
+                    <div class="settings-form-group">
+                      <label for="preferredCurrency">Preferred Currency <span class="required-star">*</span></label>
+                      <select id="preferredCurrency" class="settings-select" required>
+                        <option value="BDT">BDT - Bangladeshi Taka (৳)</option>
+                        <option value="USD">USD - US Dollar ($)</option>
+                        <option value="EUR">EUR - Euro (€)</option>
+                        <option value="GBP">GBP - British Pound (£)</option>
+                        <option value="CAD">CAD - Canadian Dollar (C$)</option>
+                        <option value="AUD">AUD - Australian Dollar (A$)</option>
+                        <option value="INR">INR - Indian Rupee (₹)</option>
+                        <option value="SAR">SAR - Saudi Riyal (﷼)</option>
+                        <option value="AED">AED - UAE Dirham (د.إ)</option>
+                        <option value="JPY">JPY - Japanese Yen (¥)</option>
+                        <option value="SGD">SGD - Singapore Dollar (S$)</option>
+                        <option value="MYR">MYR - Malaysian Ringgit (RM)</option>
+                      </select>
+                      <div class="input-hint">Default currency used across wallets, budgets, and analytics</div>
+                    </div>
+
+                    <div class="settings-form-group">
+                      <label for="preferredRegion">Region <span class="required-star">*</span></label>
+                      <select id="preferredRegion" class="settings-select" required>
+                        <option value="Bangladesh (Asia/Dhaka)">Bangladesh (Asia/Dhaka)</option>
+                        <option value="United States (en-US)">United States (en-US)</option>
+                        <option value="United Kingdom (en-GB)">United Kingdom (en-GB)</option>
+                        <option value="European Union (en-EU)">European Union (en-EU)</option>
+                        <option value="India (en-IN)">India (en-IN)</option>
+                        <option value="Canada (en-CA)">Canada (en-CA)</option>
+                        <option value="Australia (en-AU)">Australia (en-AU)</option>
+                        <option value="Saudi Arabia (ar-SA)">Saudi Arabia (ar-SA)</option>
+                        <option value="United Arab Emirates (ar-AE)">United Arab Emirates (ar-AE)</option>
+                        <option value="Singapore (en-SG)">Singapore (en-SG)</option>
+                        <option value="Malaysia (ms-MY)">Malaysia (ms-MY)</option>
+                        <option value="Japan (ja-JP)">Japan (ja-JP)</option>
+                        <option value="Global (en-US)">Global (en-US)</option>
+                      </select>
+                      <div class="input-hint">Controls regional date formatting and local time context</div>
+                    </div>
+                  </div>
+
+                  <div style="margin-top: 1.75rem; display: flex; align-items: center; gap: 12px;">
+                    <button type="submit" class="btn-save-settings" id="saveLocalizationBtn">
+                      <i class="fa-solid fa-check"></i> Save Changes
+                    </button>
+                    <span id="saveLocalizationStatusHint" style="font-size: 0.85rem; color: #64748b;"></span>
+                  </div>
+                </form>
+              </section>
+            </div>
+
+            <!-- Panel 3: Notifications -->
+            <div class="settings-tab-panel" id="panelNotifications" style="display: none;">
+              <section class="settings-card" id="notificationsCard">
+                <div class="settings-card-header">
+                  <div>
+                    <h3><i class="fa-regular fa-bell"></i> Notifications</h3>
+                    <p class="settings-card-subtitle">Toggle alerts on or off. Each notification switch is saved automatically when changed.</p>
+                  </div>
+                  <div id="notifAutoSaveBadge" class="auto-save-pill" style="display: none;">
+                    <i class="fa-solid fa-circle-check"></i> Saved automatically
+                  </div>
+                </div>
+
+                <div class="notification-list">
+                  
+                  <!-- Toggle 1: Over Budget Alerts -->
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4><i class="fa-solid fa-triangle-exclamation"></i> Over Budget alerts</h4>
+                      <p>Receive immediate alerts when expenses reach or exceed category caps and monthly limits.</p>
+                    </div>
+                    <label class="switch" for="toggleBudgetAlerts">
+                      <input type="checkbox" id="toggleBudgetAlerts" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                  <!-- Toggle 2: Daily Summary Alerts -->
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4><i class="fa-regular fa-calendar-check"></i> Daily Summary alerts</h4>
+                      <p>Receive an end-of-day digest summarizing your daily spending and remaining daily allowance.</p>
+                    </div>
+                    <label class="switch" for="toggleDailySummary">
+                      <input type="checkbox" id="toggleDailySummary" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                  <!-- Toggle 3: Weekly Report Alerts -->
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4><i class="fa-solid fa-chart-line"></i> Weekly Report alerts</h4>
+                      <p>Receive a weekly financial breakdown with category analytics and AI savings recommendations.</p>
+                    </div>
+                    <label class="switch" for="toggleWeeklyReport">
+                      <input type="checkbox" id="toggleWeeklyReport" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                  <!-- Toggle 4: Saving Goals Alerts -->
+                  <div class="toggle-row">
+                    <div class="toggle-info">
+                      <h4><i class="fa-solid fa-piggy-bank"></i> Saving Goals alerts</h4>
+                      <p>Receive progress notifications when vaults achieve target milestones or require funding.</p>
+                    </div>
+                    <label class="switch" for="toggleSavingsGoals">
+                      <input type="checkbox" id="toggleSavingsGoals" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                </div>
+              </section>
+            </div>
+
+            <!-- Panel 4: Session & Logout -->
+            <div class="settings-tab-panel" id="panelSession" style="display: none;">
+              <section class="settings-card" id="sessionCard">
+                <div class="settings-card-header">
+                  <div>
+                    <h3><i class="fa-solid fa-arrow-right-from-bracket"></i> Session & Logout</h3>
+                    <p class="settings-card-subtitle">End your current session securely and return to the login screen.</p>
+                  </div>
+                </div>
+
+                <p style="font-size: 0.88rem; color: #475569; margin-bottom: 1.5rem; line-height: 1.5;">
+                  Logging out will safely end your active session on this device. All your financial transactions, categories, budgets, and settings remain securely saved.
+                </p>
+
+                <button type="button" class="btn-logout-danger" id="settingsLogoutBtn">
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+                </button>
+              </section>
+            </div>
+
+          </div>
         </div>
+
       </div>
 
-      <a href="#" class="help-btn"><i class="fa-solid fa-question"></i></a>
+      <a href="#" class="help-btn" title="Need help?"><i class="fa-solid fa-question"></i></a>
     </main>
   </div>
 
+  <!-- Scripts -->
+  <script src="js/toast.js"></script>
+  <script src="js/user-profile.js"></script>
+  <script src="js/localization.js"></script>
+  <script src="js/topbar.js"></script>
   <script src="js/settings.js"></script>
   <script src="js/expense-modal.js"></script>
 </body>

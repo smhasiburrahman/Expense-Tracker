@@ -1,22 +1,31 @@
 // Global self-contained Add Expense modal script
 (function () {
-  // Category list
-  const categories = [
-    { name: 'Food & Dining', icon: '🍴' },
-    { name: 'Transport', icon: '🚗' },
-    { name: 'Groceries', icon: '🛒' },
-    { name: 'Shopping', icon: '🛍️' },
-    { name: 'Utilities', icon: '⚡' },
-    { name: 'Entertainment', icon: '🎬' }
-  ];
+  // Dynamic categories and wallets state
+  let categories = [];
+  let wallets = [];
 
-  // Wallet list
-  const wallets = [
-    { name: 'bKash', icon: '📱' },
-    { name: 'Cash', icon: '💵' },
-    { name: 'Rocket', icon: '⚡' },
-    { name: 'BRAC Bank', icon: '🏦' }
-  ];
+  // Helper to map icon names/classes or category names to emojis for standard select options
+  function getCategoryEmoji(icon, name) {
+    if (!icon && !name) return '📁';
+    const str = `${icon || ''} ${name || ''}`.toLowerCase();
+    if (str.includes('utensil') || str.includes('food') || str.includes('dining') || str.includes('restaur') || str.includes('eat')) return '🍴';
+    if (str.includes('basket') || str.includes('cart') || str.includes('grocer') || str.includes('market')) return '🛒';
+    if (str.includes('shopping') || str.includes('bag') || str.includes('cloth') || str.includes('store') || str.includes('shop')) return '🛍️';
+    if (str.includes('car') || str.includes('transport') || str.includes('taxi') || str.includes('ride') || str.includes('bus') || str.includes('fuel')) return '🚗';
+    if (str.includes('bolt') || str.includes('util') || str.includes('lightbulb') || str.includes('electric') || str.includes('gas') || str.includes('water')) return '⚡';
+    if (str.includes('film') || str.includes('movie') || str.includes('cinema') || str.includes('clapperboard') || str.includes('theatre') || str.includes('video')) return '🎬';
+    if (str.includes('heart') || str.includes('health') || str.includes('med') || str.includes('doctor') || str.includes('pharmacy')) return '❤️';
+    if (str.includes('mug') || str.includes('coffee') || str.includes('tea') || str.includes('cafe')) return '☕';
+    if (str.includes('book') || str.includes('grad') || str.includes('edu') || str.includes('school') || str.includes('study')) return '📚';
+    if (str.includes('home') || str.includes('house') || str.includes('rent')) return '🏠';
+    if (str.includes('plane') || str.includes('travel') || str.includes('flight') || str.includes('tour')) return '✈️';
+    if (str.includes('game') || str.includes('play') || str.includes('esport')) return '🎮';
+    if (str.includes('bill') || str.includes('money') || str.includes('cash')) return '💵';
+    if (str.includes('phone') || str.includes('mobile') || str.includes('tel')) return '📱';
+    if (str.includes('gift') || str.includes('charity')) return '🎁';
+    if (icon && !icon.startsWith('fa-') && icon.length <= 4) return icon;
+    return '📌';
+  }
 
   // Inject required modal styles directly into document head
   function injectModalStyles() {
@@ -294,7 +303,7 @@
               <div class="g-row-item">
                 <div class="g-amount-cat-box">
                   <span class="g-cur-symbol">৳</span>
-                  <input type="number" class="g-amount-input" placeholder="0" required min="1" />
+                  <input type="number" class="g-amount-input" placeholder="0" required min="1" step="any" />
                   <div class="g-cat-wrap">
                     <select class="g-cat-select" required></select>
                   </div>
@@ -326,13 +335,123 @@
     document.body.insertAdjacentHTML('beforeend', modalMarkup);
   }
 
-  // Populate options for select elements
-  function fillSelect(el, items) {
+  // Populate options for select elements dynamically
+  function fillSelect(el, items, type = 'category') {
     if (!el) return;
-    el.innerHTML = items.map(item => `
-      <option value="${item.name}">${item.icon} ${item.name}</option>
-    `).join('');
+    const currentVal = el.value;
+
+    if (type === 'category') {
+      const sourceList = (items && items.length > 0) ? items : ((window.categoriesData && window.categoriesData.length > 0) ? window.categoriesData : categories);
+      if (!sourceList || sourceList.length === 0) {
+        el.innerHTML = '<option value="">-- No Categories Found --</option>';
+        return;
+      }
+
+      el.innerHTML = sourceList.map(item => {
+        const emoji = getCategoryEmoji(item.icon, item.name);
+        return `<option value="${item.id}" data-name="${item.name}">${emoji} ${item.name}</option>`;
+      }).join('');
+    } else {
+      const sourceList = (items && items.length > 0) ? items : ((window.walletsData && window.walletsData.length > 0) ? window.walletsData : wallets);
+      if (!sourceList || sourceList.length === 0) {
+        el.innerHTML = '<option value="">-- No Wallets Found --</option>';
+        return;
+      }
+
+      el.innerHTML = sourceList.map(item => {
+        let iconText = item.icon || '📱';
+        if (iconText.startsWith('fa-')) iconText = '📱';
+        return `<option value="${item.id}">${iconText} ${item.name}</option>`;
+      }).join('');
+    }
+
+    // Preserve existing selection if valid in new options
+    if (currentVal && Array.from(el.options).some(o => String(o.value) === String(currentVal))) {
+      el.value = currentVal;
+    }
   }
+
+  // Re-render all category dropdowns in all modal rows
+  function renderAllCategoryDropdowns() {
+    const rowsWrapper = document.getElementById('globalExpenseRowsWrapper');
+    if (!rowsWrapper) return;
+    const catSelects = rowsWrapper.querySelectorAll('.g-cat-select');
+    catSelects.forEach(select => {
+      fillSelect(select, categories, 'category');
+    });
+  }
+
+  // Re-render all wallet dropdowns in all modal rows
+  function renderAllWalletDropdowns() {
+    const rowsWrapper = document.getElementById('globalExpenseRowsWrapper');
+    if (!rowsWrapper) return;
+    const walletSelects = rowsWrapper.querySelectorAll('.g-wallet-select');
+    walletSelects.forEach(select => {
+      fillSelect(select, wallets, 'wallet');
+    });
+  }
+
+  // Fetch wallets and categories dynamically from database / global state
+  async function fetchRequiredData() {
+    const token = localStorage.getItem('token');
+
+    // Check if global state already available
+    if (window.categoriesData && Array.isArray(window.categoriesData) && window.categoriesData.length > 0) {
+      categories = window.categoriesData.map(c => ({
+        id: c.id,
+        name: c.name,
+        icon: c.icon || '📌',
+        color: c.color || '#f59e0b',
+        cap: parseFloat(c.cap) || 0,
+        spent: parseFloat(c.spent) || 0
+      }));
+      window.globalCategories = categories;
+    }
+
+    if (!token) return;
+
+    try {
+      const [walletRes, catRes] = await Promise.all([
+        fetch('/api/wallets', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('/api/categories', { headers: { 'Authorization': `Bearer ${token}` } })
+      ]);
+
+      if (walletRes.ok) {
+        const walletData = await walletRes.json();
+        wallets = (walletData || []).map(w => ({
+          id: w.id,
+          name: w.name,
+          icon: w.icon || '📱',
+          balance: parseFloat(w.currentBalance || 0)
+        }));
+        window.walletsData = wallets;
+      }
+      
+      if (catRes.ok) {
+        const catData = await catRes.json();
+        categories = (catData || []).map(c => ({
+          id: c.id,
+          name: c.name,
+          icon: c.icon || '📌',
+          color: c.color || '#f59e0b',
+          cap: parseFloat(c.cap) || 0,
+          spent: parseFloat(c.spent) || 0
+        }));
+        window.categoriesData = categories;
+        window.globalCategories = categories;
+      }
+    } catch (e) {
+      console.error('Error fetching wallets/categories for modal:', e);
+    }
+  }
+
+  // Global function to trigger dynamic re-fetching and re-rendering of modal category dropdowns
+  async function refreshExpenseModalCategories() {
+    await fetchRequiredData();
+    renderAllCategoryDropdowns();
+    renderAllWalletDropdowns();
+  }
+  window.refreshExpenseModalCategories = refreshExpenseModalCategories;
 
   // Initialize modal functionality
   function setupModal() {
@@ -349,6 +468,10 @@
       dateInput.value = new Date().toISOString().split('T')[0];
     }
 
+    // Populate initial row
+    renderAllCategoryDropdowns();
+    renderAllWalletDropdowns();
+
     // Handle all click events globally
     document.addEventListener('click', function (e) {
       const openBtn = e.target.closest('#addExpenseBtn');
@@ -361,13 +484,17 @@
         e.preventDefault();
         e.stopPropagation();
 
-        const firstRow = rowsWrapper.querySelector('.g-row-item');
-        if (firstRow) {
-          fillSelect(firstRow.querySelector('.g-cat-select'), categories);
-          fillSelect(firstRow.querySelector('.g-wallet-select'), wallets);
-        }
+        // Immediately render with current cached categories/wallets
+        renderAllCategoryDropdowns();
+        renderAllWalletDropdowns();
 
         backdrop.style.display = 'flex';
+
+        // Simultaneously re-fetch from database to guarantee the absolute latest categories
+        fetchRequiredData().then(() => {
+          renderAllCategoryDropdowns();
+          renderAllWalletDropdowns();
+        });
       }
 
       // Close modal
@@ -381,10 +508,11 @@
         e.preventDefault();
         const newRow = document.createElement('div');
         newRow.className = 'g-row-item';
+        const sym = window.Localization ? window.Localization.getCurrencySymbol() : '৳';
         newRow.innerHTML = `
           <div class="g-amount-cat-box">
-            <span class="g-cur-symbol">৳</span>
-            <input type="number" class="g-amount-input" placeholder="0" required min="1" />
+            <span class="g-cur-symbol">${sym}</span>
+            <input type="number" class="g-amount-input" placeholder="0" required min="1" step="any" />
             <div class="g-cat-wrap">
               <select class="g-cat-select" required></select>
             </div>
@@ -399,8 +527,8 @@
           </div>
         `;
 
-        fillSelect(newRow.querySelector('.g-cat-select'), categories);
-        fillSelect(newRow.querySelector('.g-wallet-select'), wallets);
+        fillSelect(newRow.querySelector('.g-cat-select'), categories, 'category');
+        fillSelect(newRow.querySelector('.g-wallet-select'), wallets, 'wallet');
 
         rowsWrapper.appendChild(newRow);
       }
@@ -415,14 +543,18 @@
         const transactions = [];
 
         rows.forEach(row => {
-          const amount = parseFloat(row.querySelector('.g-amount-input').value);
-          const categoryId = row.querySelector('.g-cat-select').value;
+          const enteredAmount = parseFloat(row.querySelector('.g-amount-input').value);
+          const currentCur = window.Localization ? window.Localization.getCurrencyCode() : 'BDT';
+          const amountInBDT = window.Localization ? window.Localization.convert(enteredAmount, currentCur, 'BDT') : enteredAmount;
+          const catSelect = row.querySelector('.g-cat-select');
+          const categoryId = catSelect.value ? parseInt(catSelect.value, 10) : null;
           const desc = row.querySelector('.g-desc-input').value;
-          const walletId = row.querySelector('.g-wallet-select').value;
+          const walletSelect = row.querySelector('.g-wallet-select');
+          const walletId = walletSelect.value ? parseInt(walletSelect.value, 10) : null;
 
           transactions.push({
             transactionType: 'EXPENSE',
-            amount: amount,
+            amount: amountInBDT,
             categoryId: categoryId,
             description: desc,
             walletId: walletId,
@@ -442,70 +574,179 @@
             });
 
             if (res.ok) {
-                alert('Expense saved successfully!');
+                if (window.showToast) {
+                  showToast('Expense saved successfully!', 'success');
+                } else {
+                  alert('Expense saved successfully!');
+                }
                 backdrop.style.display = 'none';
                 form.reset();
                 if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-                
-                // Refresh page or trigger a global event to update UI
-                window.location.reload();
+
+                // Calculate total spent and identify category
+                const totalSpent = transactions.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+                const firstDesc = (transactions[0] && transactions[0].description) || 'Expense recorded';
+                const firstCat = categories.find(c => Number(c.id) === Number(transactions[0] && transactions[0].categoryId));
+                const catName = firstCat ? firstCat.name : 'Expenses';
+                const formattedTotal = window.Localization ? window.Localization.formatMoney(totalSpent, 'BDT') : `৳${totalSpent.toLocaleString()}`;
+
+                // Trigger real-time application event for the notification bell component
+                const appEvent = {
+                  type: 'daily',
+                  category: catName,
+                  title: transactions.length > 1 ? `${transactions.length} Expenses Recorded` : `Expense: ${catName}`,
+                  message: `Logged ${formattedTotal} for "${firstDesc}".`,
+                  amountBDT: totalSpent,
+                  severity: 'info',
+                  link: 'dashboard.html'
+                };
+
+                if (window.handleApplicationEvent) {
+                  window.handleApplicationEvent(appEvent);
+                } else {
+                  window.dispatchEvent(new CustomEvent('applicationEvent', { detail: appEvent }));
+                }
+
+                // Check category budget caps and trigger Over Budget alerts if spending cap is exceeded
+                const affectedCatIds = [...new Set(transactions.map(t => Number(t.categoryId)).filter(Boolean))];
+                if (window.checkAndTriggerBudgetAlert) {
+                  await window.checkAndTriggerBudgetAlert(affectedCatIds);
+                } else {
+                  try {
+                    const catRes = await fetch('/api/categories', { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (catRes.ok) {
+                      const updatedCategories = await catRes.json();
+                      categories = updatedCategories.map(c => ({
+                        id: c.id,
+                        name: c.name,
+                        icon: c.icon || '📌',
+                        color: c.color || '#f59e0b',
+                        cap: parseFloat(c.cap) || 0,
+                        spent: parseFloat(c.spent) || 0
+                      }));
+                      window.categoriesData = categories;
+
+                      for (const catId of affectedCatIds) {
+                        const cat = updatedCategories.find(c => Number(c.id) === catId);
+                        if (cat) {
+                          const spent = parseFloat(cat.spent) || 0;
+                          const cap = parseFloat(cat.cap) || 0;
+                          const percent = cap > 0 ? Math.round((spent / cap) * 100) : 0;
+                          if (cap > 0 && (spent > cap || percent >= 100)) {
+                            const budgetAlert = {
+                              type: 'budget',
+                              title: `Over Budget Alert: ${cat.name}`,
+                              category: cat.name,
+                              amountBDT: spent,
+                              capBDT: cap,
+                              percent: percent,
+                              message: `${cat.name} has exceeded its monthly budget cap. Immediate attention recommended.`,
+                              rawMessage: `${cat.name} has exceeded its monthly budget cap. Immediate attention recommended.`,
+                              severity: 'danger',
+                              icon: 'fa-solid fa-triangle-exclamation',
+                              link: 'budgets.html'
+                            };
+                            if (window.handleApplicationEvent) {
+                              window.handleApplicationEvent(budgetAlert);
+                            } else {
+                              window.dispatchEvent(new CustomEvent('applicationEvent', { detail: budgetAlert }));
+                            }
+                          }
+                        }
+                      }
+                    }
+                  } catch (err) {
+                    console.error('Error verifying budget caps after expense creation:', err);
+                  }
+                }
+
+                window.dispatchEvent(new CustomEvent('transactionCreated', { detail: transactions }));
+
+                // Dynamically refresh active page content without manual reload or navigation
+                if (typeof fetchDashboardData === 'function') {
+                  fetchDashboardData().then(() => {
+                    if (typeof renderOverviewMetrics === 'function') renderOverviewMetrics();
+                    if (typeof renderWalletsList === 'function') renderWalletsList();
+                    if (typeof renderBudgetCategories === 'function') renderBudgetCategories();
+                    if (typeof renderTransactionsTable === 'function') renderTransactionsTable();
+                  });
+                }
+                if (typeof fetchWalletsData === 'function') {
+                  fetchWalletsData().then(() => {
+                    if (typeof renderWallets === 'function') renderWallets();
+                  });
+                }
+                if (typeof fetchBudgetsData === 'function') {
+                  fetchBudgetsData().then(() => {
+                    if (typeof renderBudgetsUI === 'function') renderBudgetsUI();
+                  });
+                }
+                if (typeof fetchTransactions === 'function') {
+                  fetchTransactions();
+                }
+                if (typeof fetchVaults === 'function') {
+                  fetchVaults().then(() => {
+                    if (typeof renderVaults === 'function') renderVaults();
+                  });
+                }
+                if (typeof fetchCharityData === 'function') {
+                  fetchCharityData().then(() => {
+                    if (typeof updateCharityUI === 'function') updateCharityUI();
+                  });
+                }
             } else {
-                alert('Failed to save expense');
+                let errorMsg = 'Failed to save expense. Please check inputs.';
+                try {
+                  const errorData = await res.json();
+                  if (errorData && errorData.message) {
+                    errorMsg = errorData.message;
+                  }
+                } catch (ignored) {}
+                if (window.showToast) {
+                  showToast(errorMsg, 'error');
+                } else {
+                  alert(errorMsg);
+                }
             }
         } catch (e) {
             console.error('Error saving transaction:', e);
-            alert('Failed to save expense due to error.');
+            if (window.showToast) {
+              showToast('Failed to save expense due to error.', 'error');
+            } else {
+              alert('Failed to save expense due to error.');
+            }
         }
       });
     }
   }
 
-  // Fetch wallets and categories dynamically
-  async function fetchRequiredData() {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    try {
-      const [walletRes, catRes] = await Promise.all([
-        fetch('/api/wallets', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('/api/categories', { headers: { 'Authorization': `Bearer ${token}` } })
-      ]);
-
-      if (walletRes.ok) {
-        const walletData = await walletRes.json();
-        wallets.length = 0; // Clear array
-        walletData.forEach(w => wallets.push({ id: w.id, name: w.name, icon: w.icon || '📱' }));
-      }
-      
-      if (catRes.ok) {
-        const catData = await catRes.json();
-        categories.length = 0; // Clear array
-        catData.forEach(c => categories.push({ id: c.id, name: c.name, icon: c.icon || '📌' }));
-      }
-    } catch (e) {
-      console.error('Error fetching wallets/categories for modal:', e);
-    }
-  }
-
-  // Populate options for select elements
-  function fillSelect(el, items) {
-    if (!el) return;
-    el.innerHTML = items.map(item => {
-      let iconText = item.icon;
-      if (iconText && iconText.startsWith('fa-')) {
-          iconText = ''; // Standard <option> tags cannot render HTML/FontAwesome classes
-      }
-      return `<option value="${item.id}">${iconText ? iconText + ' ' : ''}${item.name}</option>`;
-    }).join('');
-  }
+  // Listen to system-wide category update events
+  window.addEventListener('categoryCreated', async () => {
+    await refreshExpenseModalCategories();
+  });
+  window.addEventListener('categoriesUpdated', async () => {
+    await refreshExpenseModalCategories();
+  });
+  window.addEventListener('categoryAdded', async () => {
+    await refreshExpenseModalCategories();
+  });
 
   // Run setup when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
         await fetchRequiredData();
         setupModal();
+        if (window.Localization) window.Localization.applyToDOM();
     });
   } else {
-    fetchRequiredData().then(setupModal);
+    fetchRequiredData().then(() => {
+      setupModal();
+      if (window.Localization) window.Localization.applyToDOM();
+    });
   }
+
+  // Listen for global localization changes
+  window.addEventListener('localizationChanged', () => {
+    if (window.Localization) window.Localization.applyToDOM();
+  });
 })();

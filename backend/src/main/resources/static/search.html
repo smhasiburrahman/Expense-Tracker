@@ -7,7 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/toast.css" />
   <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/search.css" />
+  <link rel="stylesheet" href="css/topbar.css" />
 </head>
 <body>
 
@@ -22,7 +25,7 @@
         </div>
       </div>
 
-      <button class="btn-add-expense" onclick="alert('Add Expense Modal')">
+      <button class="btn-add-expense" id="addExpenseBtn">
         <i class="fa-solid fa-plus"></i> Add Expense
       </button>
 
@@ -33,7 +36,7 @@
           <li><a href="wallets.html"><i class="fa-regular fa-credit-card"></i> <span>Wallets</span></a></li>
           <li><a href="budgets.html"><i class="fa-solid fa-layer-group"></i> <span>Budgets & Categories</span></a></li>
           <li><a href="savings.html"><i class="fa-solid fa-piggy-bank"></i> <span>Savings Vaults</span></a></li>
-          <li><a href="charity.html"><i class="fa-regular fa-heart"></i> <span>Charity  Tracker</span></a></li>
+          <li><a href="charity.html"><i class="fa-regular fa-heart"></i> <span>Charity Tracker</span></a></li>
           <li class="active"><a href="search.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></a><span class="active-dot"></span></li>
           <li><a href="ai-bestie.html"><i class="fa-regular fa-message"></i> <span>AI Bestie</span></a></li>
           <li><a href="settings.html"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
@@ -41,14 +44,14 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="collapse-btn" onclick="window.location.href='index.html'">
+        <div class="collapse-btn" id="logoutBtn" style="cursor: pointer;">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
         </div>
         <div class="user-profile">
-          <div class="avatar">R</div>
+          <div class="avatar" id="userAvatar">U</div>
           <div class="user-info">
-            <h4>Rahim Uddin</h4>
-            <p>rahim@example.com</p>
+            <h4 id="userName">User</h4>
+            <p id="userEmail"></p>
           </div>
         </div>
       </div>
@@ -57,81 +60,339 @@
     <!-- Main Content Area -->
     <main class="main-content">
       <header class="top-header">
-        <h2>Search</h2>
-        <div class="header-actions">
-          <div class="date-selector">
-            <i class="fa-regular fa-calendar"></i>
-            <span>Jul 1 — Jul 25, 2025</span>
-            <i class="fa-solid fa-chevron-down arrow-down"></i>
+        <h2>Universal Search</h2>
+        <div class="global-topbar-actions header-actions" id="globalTopbarActions">
+          <div class="calendar-container" id="globalCalendarContainer">
+            <button class="topbar-date-btn date-selector" id="topbarCalendarBtn" type="button" title="Interactive Calendar" aria-label="Open Calendar">
+              <i class="fa-regular fa-calendar topbar-cal-icon"></i>
+              <span class="topbar-date-text" id="topbarDateDisplay">Sep 1, 2026 — Sep 30, 2026</span>
+              <i class="fa-solid fa-chevron-down topbar-chevron-icon arrow-down"></i>
+            </button>
           </div>
-          <button class="btn-export"><i class="fa-solid fa-arrow-down"></i> Export</button>
-          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
+          <button class="topbar-export-btn btn-export" id="topbarExportBtn" type="button" title="Export" aria-label="Export">
+            <i class="fa-solid fa-arrow-down topbar-export-icon"></i>
+            <span>Export</span>
+          </button>
+          <div class="notification-container" id="globalNotificationContainer">
+            <button class="topbar-notif-btn notification-icon" id="topbarNotificationBtn" type="button" title="Notifications" aria-label="Notifications">
+              <i class="fa-regular fa-bell topbar-bell-icon"></i>
+              <span class="notification-badge" id="topbarNotificationBadge" style="display: none;">0</span>
+            </button>
+          </div>
         </div>
       </header>
 
       <div class="dashboard-body">
-        <!-- Search Bar Input -->
-        <div class="search-input-box">
-          <i class="fa-solid fa-magnifying-glass" style="color: #14806c;"></i>
-          <input type="text" id="searchInput" placeholder="Search transactions, categories, wallets..." />
+        <!-- Search Controls -->
+        <div class="search-controls-container">
+          <!-- Search Input Box -->
+          <div class="search-input-box">
+            <i class="fa-solid fa-magnifying-glass" style="color: #14806c; font-size: 1.1rem;"></i>
+            <input type="text" id="searchInput" placeholder="Search by description, category, wallet name, amount..." autofocus autocomplete="off" />
+            <button type="button" class="search-clear-btn" id="clearSearchBtn" title="Clear search" style="display: none;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Tabs Filter Row -->
+          <div class="search-tabs-row">
+            <button class="search-tab-btn active" data-tab="all" id="tabAll">
+              <i class="fa-solid fa-border-all"></i> All Results
+              <span class="badge-count" id="countAll">0</span>
+            </button>
+            <button class="search-tab-btn" data-tab="transactions" id="tabTransactions">
+              <i class="fa-solid fa-receipt"></i> Transactions
+              <span class="badge-count" id="countTransactions">0</span>
+            </button>
+            <button class="search-tab-btn" data-tab="categories" id="tabCategories">
+              <i class="fa-solid fa-layer-group"></i> Categories
+              <span class="badge-count" id="countCategories">0</span>
+            </button>
+            <button class="search-tab-btn" data-tab="wallets" id="tabWallets">
+              <i class="fa-regular fa-credit-card"></i> Wallets
+              <span class="badge-count" id="countWallets">0</span>
+            </button>
+          </div>
+
         </div>
 
-        <!-- Filter Dropdowns Row -->
-        <div class="search-filters-row">
-          <i class="fa-solid fa-sliders" style="color: #64748b;"></i>
-          <select class="filter-select" id="catFilter">
-            <option>All Categories</option>
-            <option>Food & Dining</option>
-            <option>Transport</option>
-            <option>Shopping</option>
-            <option>Utilities</option>
-          </select>
-          <select class="filter-select" id="walletFilter">
-            <option>All Wallets</option>
-            <option>bKash</option>
-            <option>Cash</option>
-            <option>BRAC Bank</option>
-          </select>
-          <select class="filter-select">
-            <option>All Dates</option>
-          </select>
+        <!-- Search Meta Status -->
+        <div class="search-meta" id="searchMeta">
+          <span id="resultsCount">Loading records...</span>
+          <span id="resultsTotalContainer" style="display: none;">Total Transaction Sum: <strong style="color: #0f172a;" id="resultsTotal">৳0</strong></span>
+        </div>
 
-          <!-- Min / Max Amount Inputs -->
-          <div class="range-pill">
-            <span>৳ Min</span>
-            <input type="number" placeholder="0" />
-            <span>— Max</span>
-            <input type="number" placeholder="99k" />
+        <!-- Empty State Container (Displayed when no match is found) -->
+        <div class="search-empty-state" id="emptySearchState" style="display: none;">
+          <div class="search-empty-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <h3 class="search-empty-title">No results found</h3>
+          <p class="search-empty-desc" id="emptySearchDesc">
+            We couldn't find any matching transactions, categories, or wallets.
+          </p>
+          <div class="search-empty-tips">
+            <span><strong><i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i> Helpful tips:</strong></span>
+            <span>• Check for typos or misspellings in the keyword.</span>
+            <span>• Try searching for broader terms like "Food", "bKash", or "Bank".</span>
+            <span>• Clear filters or search with partial words.</span>
+          </div>
+          <div>
+            <button class="search-empty-clear-btn" id="emptyClearBtn">Clear Search & View All</button>
           </div>
         </div>
 
-        <!-- Search Meta -->
-        <div class="search-meta">
-          <span id="resultsCount">10 transactions found</span>
-          <span>Total: <strong style="color: #0f172a;" id="resultsTotal">৳10,700</strong></span>
+        <!-- Results: Matching Wallets Section -->
+        <div class="search-section" id="walletsSection">
+          <div class="search-section-header">
+            <div class="search-section-title">
+              <i class="fa-regular fa-credit-card" style="color: #2563eb;"></i>
+              <span>Wallets</span>
+              <span class="badge-count" id="sectionCountWallets">0</span>
+            </div>
+            <a href="wallets.html" style="font-size: 0.85rem; color: #14806c; text-decoration: none; font-weight: 500;">
+              Manage Wallets <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i>
+            </a>
+          </div>
+          <div class="search-cards-grid" id="walletsGrid"></div>
         </div>
 
-        <!-- Transactions Table -->
-        <div class="table-card">
-          <table class="transactions-table">
-            <thead>
-              <tr>
-                <th>CATEGORY</th>
-                <th>DESCRIPTION</th>
-                <th>WALLET</th>
-                <th>AMOUNT</th>
-                <th>DATE</th>
-              </tr>
-            </thead>
-            <tbody id="searchResultsBody"></tbody>
-          </table>
+        <!-- Results: Matching Categories Section -->
+        <div class="search-section" id="categoriesSection">
+          <div class="search-section-header">
+            <div class="search-section-title">
+              <i class="fa-solid fa-layer-group" style="color: #d97706;"></i>
+              <span>Budget Categories</span>
+              <span class="badge-count" id="sectionCountCategories">0</span>
+            </div>
+            <a href="budgets.html" style="font-size: 0.85rem; color: #14806c; text-decoration: none; font-weight: 500;">
+              Manage Budgets <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i>
+            </a>
+          </div>
+          <div class="search-cards-grid" id="categoriesGrid"></div>
         </div>
+
+        <!-- Results: Matching Transactions Section -->
+        <div class="search-section" id="transactionsSection">
+          <div class="search-section-header">
+            <div class="search-section-title">
+              <i class="fa-solid fa-receipt" style="color: #14806c;"></i>
+              <span>Transactions</span>
+              <span class="badge-count" id="sectionCountTransactions">0</span>
+            </div>
+            <span style="font-size: 0.82rem; color: #64748b;">Click any row to view full details</span>
+          </div>
+          <div class="table-card" style="background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden;">
+            <table class="transactions-table" style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; text-align: left;">
+                  <th style="padding: 12px 18px; font-size: 0.78rem; color: #64748b; font-weight: 600;">CATEGORY</th>
+                  <th style="padding: 12px 18px; font-size: 0.78rem; color: #64748b; font-weight: 600;">DESCRIPTION</th>
+                  <th style="padding: 12px 18px; font-size: 0.78rem; color: #64748b; font-weight: 600;">WALLET</th>
+                  <th style="padding: 12px 18px; font-size: 0.78rem; color: #64748b; font-weight: 600;">AMOUNT</th>
+                  <th style="padding: 12px 18px; font-size: 0.78rem; color: #64748b; font-weight: 600;">DATE</th>
+                  <th style="padding: 12px 18px; font-size: 0.78rem; color: #64748b; font-weight: 600; text-align: right;">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="searchResultsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
-
-      <a href="#" class="help-btn"><i class="fa-solid fa-question"></i></a>
     </main>
   </div>
 
+  <!-- Detail Modal: Transaction -->
+  <div class="detail-modal-overlay" id="txDetailModal">
+    <div class="detail-modal">
+      <div class="detail-modal-header">
+        <h3><i class="fa-solid fa-receipt" style="color: #14806c;"></i> Transaction Details</h3>
+        <button class="detail-modal-close" onclick="closeModal('txDetailModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="detail-modal-body">
+        <div class="detail-amount-highlight" id="modalTxAmount">৳0.00</div>
+        <div class="detail-field-group">
+          <div class="detail-row">
+            <span class="detail-label">Description</span>
+            <span class="detail-value" id="modalTxDesc">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Type</span>
+            <span class="detail-value" id="modalTxType">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Category</span>
+            <span class="detail-value" id="modalTxCategory">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Wallet</span>
+            <span class="detail-value" id="modalTxWallet">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date</span>
+            <span class="detail-value" id="modalTxDate">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Entry Method</span>
+            <span class="detail-value" id="modalTxMethod">-</span>
+          </div>
+          <div class="detail-row" id="modalTxNoteRow" style="display: none;">
+            <span class="detail-label">Note</span>
+            <span class="detail-value" id="modalTxNote">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-primary-action" id="modalEditTxBtn" style="background: #2563eb; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Transaction
+          </button>
+          <button type="button" class="btn-danger-action" id="modalDeleteTxBtn" style="background: #ef4444; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-regular fa-trash-can"></i> Delete
+          </button>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn-secondary" onclick="closeModal('txDetailModal')">Close</button>
+          <a href="wallets.html" class="btn-primary-action"><i class="fa-regular fa-credit-card"></i> View in Wallets</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Transaction -->
+  <div class="detail-modal-overlay" id="searchEditTxModal">
+    <div class="detail-modal" style="max-width: 520px;">
+      <div class="detail-modal-header">
+        <h3><i class="fa-solid fa-pen-to-square" style="color: #2563eb;"></i> Edit Transaction</h3>
+        <button class="detail-modal-close" onclick="closeModal('searchEditTxModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="searchEditTxForm" style="padding: 1.5rem 1.8rem 1.8rem;">
+        <input type="hidden" id="searchEditTxId" />
+        <input type="hidden" id="searchEditTxType" />
+        <input type="hidden" id="searchEditTxVaultId" />
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Amount (৳)</label>
+          <input type="number" step="0.01" min="0.01" id="searchEditTxAmount" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; font-weight: 600; box-sizing: border-box;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Description</label>
+          <input type="text" id="searchEditTxDesc" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Wallet</label>
+            <select id="searchEditTxWallet" required style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: white; box-sizing: border-box;">
+            </select>
+          </div>
+          <div id="searchEditTxCategoryContainer">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Category</label>
+            <select id="searchEditTxCategory" style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: white; box-sizing: border-box;">
+            </select>
+          </div>
+          <div id="searchEditTxVaultContainer" style="display: none;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Target Savings Vault</label>
+            <select id="searchEditTxVault" style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: white; box-sizing: border-box;">
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Transaction Date</label>
+          <input type="date" id="searchEditTxDate" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box;" />
+        </div>
+
+        <div style="margin-bottom: 1.4rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Note / Remarks (Optional)</label>
+          <input type="text" id="searchEditTxNote" placeholder="Additional details..." style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box;" />
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+          <button type="button" class="btn-secondary" onclick="closeModal('searchEditTxModal')">Cancel</button>
+          <button type="submit" id="saveSearchEditTxBtn" style="padding: 9px 20px; background: #2563eb; color: #ffffff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Detail Modal: Category -->
+  <div class="detail-modal-overlay" id="categoryDetailModal">
+    <div class="detail-modal">
+      <div class="detail-modal-header">
+        <h3><i class="fa-solid fa-layer-group" style="color: #d97706;"></i> Category Details</h3>
+        <button class="detail-modal-close" onclick="closeModal('categoryDetailModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="detail-modal-body">
+        <div class="detail-amount-highlight" id="modalCatCap">৳0.00</div>
+        <p style="text-align: center; color: #64748b; font-size: 0.85rem; margin-top: -12px; margin-bottom: 20px;">Monthly Budget Cap</p>
+        <div class="detail-field-group">
+          <div class="detail-row">
+            <span class="detail-label">Category Name</span>
+            <span class="detail-value" id="modalCatName">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Spent This Month</span>
+            <span class="detail-value" id="modalCatSpent" style="color: #e11d48;">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Budget Progress</span>
+            <span class="detail-value" id="modalCatProgress">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status</span>
+            <span class="detail-value" id="modalCatStatus">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-modal-footer">
+        <button class="btn-secondary" onclick="closeModal('categoryDetailModal')">Close</button>
+        <a href="budgets.html" class="btn-primary-action"><i class="fa-solid fa-layer-group"></i> Manage in Budgets</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal: Wallet -->
+  <div class="detail-modal-overlay" id="walletDetailModal">
+    <div class="detail-modal">
+      <div class="detail-modal-header">
+        <h3><i class="fa-regular fa-credit-card" style="color: #2563eb;"></i> Wallet Details</h3>
+        <button class="detail-modal-close" onclick="closeModal('walletDetailModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="detail-modal-body">
+        <div class="detail-amount-highlight" id="modalWalletBalance" style="color: #14806c;">৳0.00</div>
+        <p style="text-align: center; color: #64748b; font-size: 0.85rem; margin-top: -12px; margin-bottom: 20px;">Current Available Balance</p>
+        <div class="detail-field-group">
+          <div class="detail-row">
+            <span class="detail-label">Wallet Name</span>
+            <span class="detail-value" id="modalWalletName">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Opening Balance</span>
+            <span class="detail-value" id="modalWalletOpening">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Currency</span>
+            <span class="detail-value" id="modalWalletCurrency">BDT (৳)</span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-modal-footer">
+        <button class="btn-secondary" onclick="closeModal('walletDetailModal')">Close</button>
+        <a href="wallets.html" class="btn-primary-action"><i class="fa-regular fa-credit-card"></i> Manage in Wallets</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/toast.js"></script>
+  <script src="js/user-profile.js"></script>
+  <script src="js/localization.js"></script>
+  <script src="js/topbar.js"></script>
   <script src="js/search.js"></script>
   <script src="js/expense-modal.js"></script>
 </body>

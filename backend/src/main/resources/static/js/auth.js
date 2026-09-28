@@ -28,6 +28,10 @@ if (loginForm) {
     const password = document.getElementById('password').value;
     const btn = document.getElementById('signInBtn');
     
+    const alertBox = document.getElementById('loginAlertBox');
+    const alertText = document.getElementById('loginAlertText');
+    if (alertBox) alertBox.style.display = 'none';
+
     btn.disabled = true;
     btn.textContent = 'Signing in...';
 
@@ -35,20 +39,45 @@ if (loginForm) {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: email.trim(), password })
       });
       
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token);
+
+        // Pre-fetch user profile to initialize global session state before redirecting
+        try {
+          const profileRes = await fetch('/api/users/me', {
+            headers: { 'Authorization': `Bearer ${data.token}` }
+          });
+          if (profileRes.ok) {
+            const profileData = await profileRes.json();
+            localStorage.setItem('currentUser', JSON.stringify(profileData));
+          }
+        } catch (profileErr) {
+          console.warn('Could not pre-fetch profile on login:', profileErr);
+        }
+
         window.location.href = 'dashboard.html';
       } else {
         const errText = await response.text();
-        alert('Login failed: ' + errText);
+        const msg = errText || 'Invalid email or password';
+        if (alertBox && alertText) {
+          alertText.textContent = msg;
+          alertBox.style.display = 'flex';
+        } else {
+          alert('Login failed: ' + msg);
+        }
       }
     } catch (error) {
       console.error(error);
-      alert('An error occurred during login.');
+      if (alertBox && alertText) {
+        alertText.textContent = 'Connection error. Please ensure the backend server is reachable.';
+        alertBox.style.display = 'flex';
+      } else {
+        alert('An error occurred during login.');
+      }
     } finally {
       btn.disabled = false;
       btn.textContent = 'Sign in';
@@ -93,6 +122,19 @@ if (registerForm) {
         if(loginRes.ok) {
           const data = await loginRes.json();
           localStorage.setItem('token', data.token);
+
+          try {
+            const profileRes = await fetch('/api/users/me', {
+              headers: { 'Authorization': `Bearer ${data.token}` }
+            });
+            if (profileRes.ok) {
+              const profileData = await profileRes.json();
+              localStorage.setItem('currentUser', JSON.stringify(profileData));
+            }
+          } catch (profileErr) {
+            console.warn('Could not pre-fetch profile on register:', profileErr);
+          }
+
           window.location.href = 'onboarding.html';
         } else {
           alert('Registration successful, but auto-login failed. Please sign in.');

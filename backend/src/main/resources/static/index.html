@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Link to CSS -->
+  <link rel="stylesheet" href="css/toast.css" />
   <link rel="stylesheet" href="css/auth.css" />
 </head>
 <body>
@@ -50,11 +51,16 @@
           <p>Sign in to manage your finances</p>
         </div>
 
+        <div id="loginAlertBox" style="display: none; padding: 10px 14px; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="loginAlertText"></span>
+        </div>
+
         <form id="loginForm">
           <!-- Email Input -->
           <div class="form-group">
             <label for="email">Email address</label>
-            <input type="email" id="email" placeholder="hasiburrahman@gmail.com" required />
+            <input type="email" id="email" placeholder="you@example.com" required />
           </div>
 
           <!-- Password Input -->
@@ -62,8 +68,8 @@
             <label for="password">Password</label>
             <div class="input-with-icon">
               <input type="password" id="password" placeholder="••••••••" required />
- <!-- Toggle Password Button -->
-              <button type="button" class="eye-btn" id="toggleRegPassword">
+              <!-- Toggle Password Button -->
+              <button type="button" class="eye-btn" id="togglePassword">
                 <i class="fa-regular fa-eye"></i>
               </button>
             </div>
@@ -89,6 +95,7 @@
   </div>
 
   <!-- Link to JS -->
+  <script src="js/toast.js"></script>
   <script src="js/auth.js"></script>
 </body>
 </html>

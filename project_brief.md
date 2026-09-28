@@ -51,12 +51,28 @@ Used to log an expense entry. Clicking this button opens a modal with 3 entry ty
 ### 7. Analytics Page
 - **UI Elements:** Spending analytics filtered by Weekly or Monthly views. Includes a Spending by Category graph and a Monthly Spending Trend chart.
 
+{UI Elements: Analytics filters for Weekly, Monthly, and Custom Range views, Spending by Category chart, Monthly Spending Trend chart, and AI Insights.
+Date Range Filter: Users can select Weekly, Monthly, or a Custom Date Range to filter the analytics data.
+Spending by Category: Displays a chart showing the total amount and percentage of spending for each expense category within the selected date range.
+Monthly Spending Trend: Displays a chart showing spending trends over multiple months, broken down by expense categories.
+AI Insights: Provides spending-related insights such as Spending Anomaly, Budget Forecast, Subscription Audit, and Price Benchmarking based on the user's financial data.
+Export: Users can export the displayed analytics/report for the selected date range.}
+
 ### 8. Dashboard Page
 - **UI Elements:** Daily allowance (sum of all budget caps / total month days), Total spent (sum of all category spending), Remaining budget (sum of all budget caps - total spent), Total savings (sum of all vault funds).
 - Includes wallet summaries, budget category summaries, and recent transactions.
 
 ### 9. Search Page
 - **UI Elements:** Search functionality for transactions, categories, and wallets.
+
+{UI Elements: Search bar and search results for transactions, categories, and wallets.
+Search Functionality: Users can enter a keyword in the search bar to find matching transactions, categories, or wallets.
+Search Results: Matching results are displayed based on the entered keyword.
+Transactions: Search can match transaction information such as description, category, wallet, or other relevant transaction details.
+Categories: Search can find categories by category name.
+Wallets: Search can find wallets by wallet name.
+Result Interaction: Users can select a search result to view or access the corresponding transaction, category, or wallet details.
+Empty Results: If no matching result is found, the system displays an appropriate "No results found" message.}
 
 ### 10. Settings Page
 - **Account Settings:** Edit Name, Email Address, and Monthly Income.

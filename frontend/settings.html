@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings - Financial Bestie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-wallet"></i></div>
+        <div class="brand-text">
+          <span class="title">Financial</span>
+          <span class="subtitle">Bestie</span>
+        </div>
+      </div>
+
+      <button class="btn-add-expense" onclick="alert('Add Expense Modal')">
+        <i class="fa-solid fa-plus"></i> Add Expense
+      </button>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="dashboard.html"><i class="fa-solid fa-table-columns"></i> <span>Dashboard</span></a></li>
+          <li><a href="analytics.html"><i class="fa-solid fa-chart-pie"></i> <span>Analytics</span></a></li>
+          <li><a href="wallets.html"><i class="fa-regular fa-credit-card"></i> <span>Wallets</span></a></li>
+          <li><a href="budgets.html"><i class="fa-solid fa-layer-group"></i> <span>Budgets & Categories</span></a></li>
+          <li><a href="savings.html"><i class="fa-solid fa-piggy-bank"></i> <span>Savings Vaults</span></a></li>
+          <li><a href="sadaqa.html"><i class="fa-regular fa-heart"></i> <span>Charity  Tracker</span></a></li>
+          <li><a href="search.html"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></a></li>
+          <li><a href="ai-bestie.html"><i class="fa-regular fa-message"></i> <span>AI Bestie</span></a></li>
+          <li class="active"><a href="settings.html"><i class="fa-solid fa-gear"></i> <span>Settings</span></a><span class="active-dot"></span></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="collapse-btn" onclick="window.location.href='index.html'">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
+        </div>
+        <div class="user-profile">
+          <div class="avatar">R</div>
+          <div class="user-info">
+            <h4>Rahim Uddin</h4>
+            <p>rahim@example.com</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="top-header">
+        <h2>Settings</h2>
+        <div class="header-actions">
+          <div class="date-selector">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Jul 1 — Jul 25, 2025</span>
+            <i class="fa-solid fa-chevron-down arrow-down"></i>
+          </div>
+          <button class="btn-export"><i class="fa-solid fa-arrow-down"></i> Export</button>
+          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
+        </div>
+      </header>
+
+      <div class="dashboard-body">
+        <div class="settings-grid">
+          
+          <!-- Settings Navigation Tabs -->
+          <div class="settings-nav">
+            <div class="settings-nav-item active"><i class="fa-regular fa-user"></i> Account</div>
+            <div class="settings-nav-item"><i class="fa-solid fa-globe"></i> Currency & Region</div>
+            <div class="settings-nav-item"><i class="fa-regular fa-bell"></i> Notifications</div>
+            <div class="settings-nav-item"><i class="fa-solid fa-tag"></i> Categories</div>
+          </div>
+
+          <!-- Account Settings Form -->
+          <div class="settings-card">
+            <h3>Account Settings</h3>
+            
+            <form id="settingsForm">
+              <div class="settings-form-group">
+                <label for="profileFullName">Full Name</label>
+                <input type="text" id="profileFullName" value="Rahim Uddin" required />
+              </div>
+
+              <div class="settings-form-group">
+                <label for="profileEmail">Email Address</label>
+                <input type="email" id="profileEmail" value="rahim@example.com" required />
+              </div>
+
+              <div class="settings-form-group">
+                <label for="monthlyIncome">Monthly Income (BDT)</label>
+                <input type="number" id="monthlyIncome" value="65000" required />
+              </div>
+
+              <button type="submit" class="btn-save-settings">Save Changes</button>
+            </form>
+
+            <div class="link-logout-red" onclick="window.location.href='index.html'">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <a href="#" class="help-btn"><i class="fa-solid fa-question"></i></a>
+    </main>
+  </div>
+
+  <script src="js/settings.js"></script>
+  <script src="js/expense-modal.js"></script>
+</body>
+</html>
